@@ -1,0 +1,7 @@
+nb_log
+threadpool_executor_shrink_able
+redis2
+redis3
+decorator_libs
+pymysql==0.8.1
+torndb_for_python3
