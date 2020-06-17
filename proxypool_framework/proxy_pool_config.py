@@ -9,8 +9,8 @@ MAX_NUM_PROXY_IN_DB = 1000  # redis中存在超过这个代理数量后，将不
 
 """代理池是sorted set结构，键是ip,值是该ip最后一次的检测时间戳。一轮一轮的扫描，检测到存量代理ip的最后一次检测时间离现在超过这个时间就重新检测，否则此轮不检测此代理，
 MAX_SECONDS_MUST_CHECK_AGAIN 的值要适当，过大会导致检测不及时，取出来后使用时成功率变低；过小会导致检测存量代理ip的密度过大，当存量代理太多的时候，会导致cpu消耗高。"""
-MAX_SECONDS_MUST_CHECK_AGAIN = 5
-REQUESTS_TIMEOUT = 2  # 请求响应时间超过这个值，视为废物代理。
+MAX_SECONDS_MUST_CHECK_AGAIN = 1
+REQUESTS_TIMEOUT = 1  # 请求响应时间超过这个值，视为废物代理。
 FLASK_PORT = 6795  # 代理ip获取的接口。
 
 # python util.py REDIS_URL=redis// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6796

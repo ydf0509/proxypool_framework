@@ -44,11 +44,12 @@ for i in range(10000):
         # print(resp.text[:10])
         logger.info(f'成功, 消耗时间 {time.time() - t_start}，  代理是 \033[0;41m{pr}\033[0m')
         suceess_count +=1
+        total_request_time += time.time() - t_start
     except Exception as e:
         logger.warning(f'失败, 消耗时间{time.time() - t_start}，  代理是 \033[0;41m{pr}\033[0m')
     total_count +=1
     if i % 10 == 0:
-        logger.debug(f'成功率是 {suceess_count/total_count}')
+        logger.debug(f'当前请求总次数是 {total_count}， 成功次数是 {suceess_count} ,成功率是 {suceess_count/total_count}, 平均响应时间 {total_request_time /suceess_count}')
 
 
 
