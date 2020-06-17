@@ -1,126 +1,41 @@
-# db_libs
+# proxypool_framework 
 
-各种数据库的封装。只封装最难的部分，十分克制,很少去添加一些新的方法然后去调用原生类的方法。
+proxypool_framework 是万能通用ip代理池架构 + 内置附带的20+个免费代理ip网站爬取函数。
 
-因为原生类已经很好用了，主要是控制一下用户无限实例化连接类，造成反复创建连接就可以了。
+## 免费代理数量秒杀收费代理，质量超过部分收费代理。所有代理都能访问https。
 
 ```
-redis_lib和mongo_lib在redis和pymongo的基础上进行封装。
-由于原生的包已经足够好用了，并不需要重新写几百个方法进行过度封装。
-仅仅是加了享元模式，使得在相同入参情况下无限实例化相关客户端类的时候不会反复重新连接。
-封装方式采用的非常规方式，使用的是继承方式，而非通常情况下的使用组合来进行封装。
-继承方式封装的比组合模式封装的好处更多。
+如果只搞过xici网站，就认为免费没好货那就错了，西祠是免费代理ip网站的中等偏下的网站，比西祠更差的网站都有一大堆。
 
-
-
-mysql_lib使用连接池，兼容在多线程环境运行。使调用时候少关注cursor commit close 等。
-
-sqla_lib 是反射已存在的表，也是使用连接池，兼容多线程环境运行。能够支持orm和原生sql语句两种执行方式。
+由于代理池核心架构实现了高扩展，新增一个平台 写解析代码 + 集成到代理池维护 只需要5分钟以内，所以可以快速测试很多个网站。
+目前已经测试了20+个网站，其中超过xici可用数量30多倍的网站，就已经发现了3个了。代理数量差的网站没有注册到代理池维护中。
 
 ```
 
-```python
-# 组合模式封装的代码一般是如下这种例子。
-"""
-这种方式封装是组合，精确点是23种设计模式的代理模式。
-代理模式说的是定义很多方法，来调用self.r所具有的方法。
-
-
-另外对于无限实例化，还使用了享元模式。
-封装数据库切记不要使用单例模式，如果入参传了不同的主机ip或者不同的db，而仍然返回之前的连接对象，那就大错特错了。
-
-"""
-# 使用组合模式封装的redis，没有继承模式的好用。
-import redis
-
-class RedisClient:
-
-    params__reids_map = {}
-
-    def __init__(self,host,db,port,password):
-        if (host,db,port,password) not in self.__class__.params__reids_map:
-            self.r = redis.Redis(host,db,port,password)
-            self.__class__.params__reids_map[(host,db,port,password)] = self.r
-        else:
-            self.r = self.__class__.params__reids_map[(host,db,port,password)]
-    
-    def my_set(self,key,value):
-        print('额外的扩展')
-        self.r.set(name=key,value=value)
-    
-    def my_get(self,name):
-        # 这个封装简直是多次一举，在redis实例化时候，
-        # 将Redis类的构造方法的入参 decode_responses设置为True，就可以避免几百个方法需要反复decode了。
-        return self.r.get(name).decode()
 
 ```
+十分方便扩展各种免费和收费的代理池维护，具有高性能和高并发检测。
 
-#### 例如网上的一种封装，重新封装几百个方法，我不喜欢这样封装工具类。
-```python
-import redis
+只要写3行代码代理ip解析函数，传给ProxyCollector类，运行work方法，就可以循环执行拉取新代理ip并检测入库，
+同时按最后一次的检测时间戳,重新检测超过指定时间的存量代理ip
 
-class MyRedis():
-    def __init__(self,ip,password,port=6379,db=1):#构造函数
-        try:
-            self.r = redis.Redis(host=ip,password=password,port=port,db=db)  #连接redis固定方法,这里的值必须固定写死
-        except Exception as e:
-            print('redis连接失败，错误信息%s'%e)
-    def str_get(self,k):
-        res = self.r.get(k)   #会从服务器传对应的值过来，性能慢
-        if res:
-            return res.decode()   #从redis里面拿到的是bytes类型的数据，需要转换一下
+代理ip池使用的是 redis的sortedset结构，键是代理ip，评分是检测时候的时间戳。
 
-    def str_set(self,k,v,time=None): #time默认失效时间
-        self.r.set(k,v,time)
+可以一键 将多个网站维护到一个代理池，也可以维护多个不同的redis键代理池。
+```   
 
-    def delete(self,k):
-        tag = self.r.exists(k)
-        #判断这个key是否存在,相对于get到这个key他只是传回一个存在火灾不存在的信息，
-        # 而不用将整个k值传过来（如果k里面存的东西比较多，那么传输很耗时）
-        if tag:
-            self.r.delete(k)
-        else:
-            print('这个key不存在')
+### 文件作用介绍
+```
+functions_of_get_https_proxy_from_websites.py 
+是从各个网站或付费api获取代理ip的爬取函数大全。
 
-    def hash_get(self,name,k):  #哈希类型存储的是多层字典（嵌套字典）
-        res = self.r.hget(name,k)
-        if res:
-            return res.decode()  #因为get不到值得话也不会报错所以需要判断一下
+proxy_collector.py 
+1）是自动维护代理池,是万能通用的代理池。可以用于任意免费平台或者收费平台进行代理池维护。
+2）启动一个web接口，/get_a_proxy接口返回一个代理ip。/get_a_proxy后面接的数字为最近检测时候的n个代理中随机返回一个，数字越小范围越小质量越好。 
 
-    def hash_set(self,name,k,v): #哈希类型的是多层
-        self.r.hset(name,k,v)   #set也不会报错
+proxy_pool_config.py 
+代理池配置,可以写在文件中也可以用python命令参数传参方式。
 
-    def hash_getall(self,name):
-        res = self.r.hgetall(name)   #得到的是字典类型的，里面的k,v都是bytes类型的
-        data={}
-        if res:
-            for k,v in res.items(): #循环取出字典里面的k,v，在进行decode
-                k = k.decode()
-                v = v.decode()
-                data[k]=v
-        return data
-
-    def hash_del(self,name,k):
-        res = self.r.hdel(name,k)
-        if res:
-            print('删除成功')
-            return 1
-        else:
-            print('删除失败，该key不存在')
-            return 0
-
-    @property   #属性方法，
-                # 使用的时候和变量一个用法就好比实例，A=MyRedis(), A.clean_redis使用，
-                # 如果不加这个@property,使用时A=MyRedis(), A.clean_redis()   后面需要加这个函数的括号
-    def clean_redis(self):
-        self.r.flushdb()   #清空 redis
-        print('清空redis成功！')
-        return 0
-
-
-
-a = MyRedis('118.0000','HK0000*')
-
-print(a.str_get('duan'))
-
+tests/test_check_proxy_pool_public_rate_of_success.py 
+是大规模检测代理池中的ip访问百度的成功率统计。
 ```

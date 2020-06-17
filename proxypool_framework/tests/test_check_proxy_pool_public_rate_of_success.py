@@ -9,7 +9,7 @@ from threading import Lock
 
 from threadpool_executor_shrink_able import BoundedThreadPoolExecutor
 
-from proxy_pool_public.proxy_pool_config import REDIS_CLIENT
+from proxypool_framework.proxy_pool_config import REDIS_CLIENT
 
 pool = BoundedThreadPoolExecutor(300)
 
@@ -36,7 +36,7 @@ def f1():
         # pr = json.loads(random.choice(REDIS_CLIENT.zrevrange('proxy_free', 0, 50)))
         # print(pr)
 
-        pr = json.loads(requests.get('http://192.168.199.202:6795/get_a_proxy/10', auth=('user', 'mtfy123')).text)
+        pr = json.loads(requests.get('http://127.0.0.1:6795/get_a_proxy/10', auth=('user', 'mtfy123')).text)
         # print(pr)
         t_start = time.time()
         resp = requests.get('http://www.baidu.com/content-search.xml', proxies=pr, timeout=20)
