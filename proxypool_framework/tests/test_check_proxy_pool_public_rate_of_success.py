@@ -11,7 +11,7 @@ from threadpool_executor_shrink_able import BoundedThreadPoolExecutor
 
 from proxypool_framework.proxy_pool_config import REDIS_CLIENT
 
-pool = BoundedThreadPoolExecutor(30)
+pool = BoundedThreadPoolExecutor(10)
 logger = nb_log.LogManager(__name__).get_logger_and_add_handlers(formatter_template=7,log_filename='rate_of_success.log')
 
 
@@ -42,9 +42,9 @@ def f1():
         # 'http://www.baidu.com/content-search.xml'
         resp = requests.get('https://ydgf.sohu.com/schedule/index.json', proxies=pr, timeout=20)
         # print(resp.text[:10])
-        logger.info(f'成功, 消耗时间 {time.time() - t_start}，  代理是 \033[0;47m{pr}\033[0m')
+        logger.info(f'成功, 消耗时间 {time.time() - t_start}，  代理是 \033[0;41m{pr}\033[0m')
     except Exception as e:
-        logger.warning(f'失败, 消耗时间{time.time() - t_start}，  代理是 \033[0;47m{pr}\033[0m')
+        logger.warning(f'失败, 消耗时间{time.time() - t_start}，  代理是 \033[0;41m{pr}\033[0m')
 
 
 def f2():
