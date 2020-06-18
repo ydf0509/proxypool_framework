@@ -4,6 +4,8 @@ proxypool_framework 是通用ip代理池架构 + 内置的20+ 个免费代理ip�
 从ip数量、ip质量、代理池实现本身的难度和代码行数、代理池扩展平台需要的代码行数和难度、配置方式、代理检测设计算法，
 是py史上最强的代理池，欢迎对比任意项目代理池项目，如果这不是最强的，可以写出理由反驳，并贴出更好代码的地址。
 
+使用方式如下，安装pip包，然后执行python -m proxypool_framework.proxy_collector 接一大串自定义的配置。（也可以拉取git使用）
+
 pip install proxypool_framework
 
 python -m proxypool_framework.proxy_collector REDIS_URL=redis:// 
