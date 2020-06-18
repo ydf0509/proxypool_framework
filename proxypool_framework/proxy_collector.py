@@ -34,6 +34,9 @@ def create_app():
             "user": json.dumps(
                 {"password": "mtfy123", "max_count_per_day": 99999999, "max_use_seconds": 3600 * 24 * 3650,
                  "use_begin_time": time_begin}),
+            "user2": json.dumps(
+                {"password": "pass2", "max_count_per_day": 99999999, "max_use_seconds": 3600 * 24 * 3650,
+                 "use_begin_time": time_begin}),
             "test": json.dumps(
                 {"password": "test", "max_count_per_day": 1000, "max_use_seconds": 3600,
                  "use_begin_time": time_begin}),

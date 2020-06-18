@@ -73,7 +73,13 @@ python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS
 3)pip install proxypool_framework
 python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
 
+也可以分两次启动，指定不同的redis默认键和flask 端口，
+弄一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间小的启动配置生成优质代理池维护在proxy1键中，数量少，成功率高。
+再启动一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间大的启动配置生成中等代理池维护在proxy2键中，数量多，成功率低。
 
+
+启动后可以访问127.0.0.1:6795（指定的端口号），有多个api接口
+http://127.0.0.1:6795/get_a_proxy/30?u=user2&p=pass2  #指得是从最接近现在的检测时间的30个代理中随机返回一个。
 ```
 
 ### 配置说明
@@ -96,6 +102,7 @@ MAX_SECONDS_MUST_CHECK_AGAIN = 1 REQUESTS_TIMEOUT = 40，这种配置就相当�
 MAX_SECONDS_MUST_CHECK_AGAIN = 2
 REQUESTS_TIMEOUT = 1  # 请求响应时间超过这个值，视为废物代理。
 FLASK_PORT = 6795  # 代理ip获取的接口
+PROXY_KEY_IN_REDIS_DEFAULT = 'proxy_free' # 默认的redis sorted set键，指的是如果你不在ProxyCollector实例化时候亲自指定键的名字（主要是为了一次启动实现维护多个redis代理池）。
 ```
 
 
