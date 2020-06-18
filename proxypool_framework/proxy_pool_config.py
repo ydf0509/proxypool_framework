@@ -3,7 +3,7 @@ import sys
 import nb_log  # noqa
 import redis2  # pip install redsi2
 
-# 可以直接修改这里的值为自己的最终值，也可以使用命令行方式覆盖这里的配置。命令行是为了可以快速的不修改代码配置而进行方便质量数量调优。
+# 可以直接修改这里的值为自己的最终值，也可以使用命令行方式覆盖这里的配置。命令行是为了可以快速的不修改代码配置而进行方便质量数量调优,和不改配置，多次启动分别生成优质代理池、普通代理池。
 REDIS_URL = 'redis://:@'  # redis的url连接方式百度，可以指定db和ip和密码。
 MAX_NUM_PROXY_IN_DB = 1000  # redis中存在超过这个代理数量后，将不再拉取新代理，防止检测存量ip消耗资源过多。
 
@@ -27,9 +27,9 @@ PROXY_KEY_IN_REDIS_DEFAULT = 'proxy_free' # 默认的redis sorted set键，指�
 for para in sys.argv[1:]:
     print(f'配置项:  {para}')
     config_name = para.split('=')[0]
-    if config_name in ['REDIS_URL','PROXY_KEY_IN_REDIS']:
+    if config_name in ['REDIS_URL','PROXY_KEY_IN_REDIS_DEFAULT']:
         globals()[config_name] = para.split('=')[1]
-    for config_name in ['MAX_NUM_PROXY_IN_DB', 'MAX_SECONDS_MUST_CHECK_AGAIN', 'REQUESTS_TIMEOUT', 'FLASK_PORT']:
+    if config_name in ['MAX_NUM_PROXY_IN_DB', 'MAX_SECONDS_MUST_CHECK_AGAIN', 'REQUESTS_TIMEOUT', 'FLASK_PORT']:
         globals()[config_name] = int(para.split('=')[1])
 
 globals_copy = copy.copy(globals())
