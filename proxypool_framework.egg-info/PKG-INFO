@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: proxypool-framework
-Version: 0.5
+Version: 0.6
 Summary: proxypool_framework 是万能通用代理池架构，实现核心代码很少只有87行，同时想扩展一个代理平台仅需要写三行代码。通用代理池附带20+ 免费网站代理
 Home-page: UNKNOWN
 Author: bfzs
@@ -75,17 +75,17 @@ Description: # proxypool_framework
         1)
         export PYTHONPATH=/codes/proxypool_framework （指的是你的代码的位置，codes换成你的位置） # 这个原理就不需解释了，不知道PYTHONPATH是什么就太low了。
         
-        python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
+        python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
         或者在 proxy_pool_config.py 文件中把配置写好，就不需要命令行来传参了。直接 python proxy_collector.py
         
         2)pycharm中打开此项目，可以直接右键点击run proxy_collector.py
         
         3)pip install proxypool_framework
-        python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
-        
-        也可以分两次启动，指定不同的redis默认键和flask 端口，
-        弄一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间小的启动配置生成优质代理池维护在proxy1键中，数量少，成功率高。
-        再启动一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间大的启动配置生成中等代理池维护在proxy2键中，数量多，成功率低。
+        python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
+         
+        也可以分两次启动，指定不同的redis默认键和flask ，
+        弄一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间小的启动配置,生成优质代理池默认维护在proxy1键中，数量少，成功率高。
+        再启动一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间大的启动配置,生成中等代理池默认维护在proxy2键中，数量多，成功率低。
         
         
         启动后可以访问127.0.0.1:6795（指定的端口号），有多个api接口
@@ -143,7 +143,7 @@ Description: # proxypool_framework
         
         
         
-        python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=2 REQUESTS_TIMEOUT=1 FLASK_PORT=6795
+        python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=2 REQUESTS_TIMEOUT=1 FLASK_PORT=6795 
         ```
         ![Image text](https://i.niupic.com/images/2020/06/18/8hbY.png)
         

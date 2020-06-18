@@ -23,7 +23,7 @@ REQUESTS_TIMEOUT = 1  # 请求响应时间超过这个值，视为废物代理�
 FLASK_PORT = 6795  # 代理ip获取的接口。
 PROXY_KEY_IN_REDIS_DEFAULT = 'proxy_free' # 默认的redis sorted set键，指的是如果你不在ProxyCollector实例化时候亲自指定键的名字（主要是为了一次启动实现维护多个redis代理池）。
 
-# python util.py REDIS_URL=redis://:123456@ MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
+# python util.py REDIS_URL=redis://:123456@ MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
 for para in sys.argv[1:]:
     print(f'配置项:  {para}')
     config_name = para.split('=')[0]
