@@ -216,14 +216,21 @@ class ProxyCollector:
 if __name__ == '__main__':
     """初次运行时候由于redis中没有代理ip做爬取第三方网站的引子，会被免费代理网站反爬，ip在前几分钟内会比较少。之后会增多，耐心等待。
     
-    启动方式：
+    启动方式种类：
+    1)
     export PYTHONPATH=/codes/proxypool_framework （指的是你的代码的位置，codes换成你的位置） # 这个原理就不需解释了，不知道PYTHONPATH是什么就太low了。
     
-    python proxy_collector.py REDIS_URL=redis// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795
+    python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795
     或者在 proxy_pool_config.py 文件中把配置写好，就不需要命令行来传参了。直接 python proxy_collector.py
+    
+    2)pycharm中打开此项目，可以直接右键点击run proxy_collector.py
+    
+    3)pip install proxypool_framework
+    python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795
     """
 
     os.system(f"""netstat -nltp|grep ':{FLASK_PORT} '|awk '{{print $NF}}'|awk -F/ '{{print $1}}'""")  # 杀死端口，避免ctrl c关闭不彻底，导致端口被占用。
+    """启动代理池自动持续维护"""
     ProxyCollector(get_iphai_proxies_list, platform_name='iphai', time_sleep_for_get_new_proxies=70, ).work()
     ProxyCollector(get_from_seofangfa, platform_name='seofangfa', time_sleep_for_get_new_proxies=70, ).work()
     for p in range(1, 3):
@@ -245,6 +252,7 @@ if __name__ == '__main__':
         ProxyCollector(get_nima_proxies_list, (p, 'https'), platform_name='nima', time_sleep_for_get_new_proxies=time_sleep_for_get_new_proxiesx).work()
         ProxyCollector(get_from_jiangxianli, func_kwargs={'p': p}, platform_name='jiangxianli', time_sleep_for_get_new_proxies=time_sleep_for_get_new_proxiesx).work()
 
+    """启动api"""
     http_server = HTTPServer(WSGIContainer(create_app()))
     http_server.listen(FLASK_PORT)
     IOLoop.instance().start()
