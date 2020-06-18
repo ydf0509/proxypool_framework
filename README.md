@@ -1,7 +1,8 @@
 # proxypool_framework 
 
 proxypool_framework 是通用ip代理池架构 + 内置的20+ 个免费代理ip网站爬取函数。
-从ip数量、ip质量、代理池实现本身、代理池扩展平台需要的代码行数、配置方式，是py史上最强的代理池，欢迎对比任意项目代理池项目，如果这不是最强的，可以找我。
+从ip数量、ip质量、代理池实现本身的难度和代码行数、代理池扩展平台需要的代码行数和难度、配置方式、代理检测设计算法，
+是py史上最强的代理池，欢迎对比任意项目代理池项目，如果这不是最强的，可以写出理由反驳，并贴出更好代码的地址。
 
 
 ### 关于免费代理
@@ -58,23 +59,20 @@ tests/test_rate_of_success.py
 
 ### 三种启动方式
 ```
-    """初次运行时候由于redis中没有代理ip做爬取第三方网站的引子，会被免费代理网站反爬，ip在前几分钟内会比较少。之后会增多，耐心等待。
+初次运行时候由于redis中没有代理ip做爬取第三方网站的引子，会被免费代理网站反爬，ip在前几分钟内会比较少。之后会增多，耐心等待。
     
-    启动方式种类：
-    1)
-    export PYTHONPATH=/codes/proxypool_framework （指的是你的代码的位置，codes换成你的位置） # 这个原理就不需解释了，不知道PYTHONPATH是什么就太low了。
-    
-    python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795
-    或者在 proxy_pool_config.py 文件中把配置写好，就不需要命令行来传参了。直接 python proxy_collector.py
-    
-    2)pycharm中打开此项目，可以直接右键点击run proxy_collector.py
-    
-    3)pip install proxypool_framework
-    python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795
-    """
+启动方式种类：
+1)
+export PYTHONPATH=/codes/proxypool_framework （指的是你的代码的位置，codes换成你的位置） # 这个原理就不需解释了，不知道PYTHONPATH是什么就太low了。
 
-启动后可以访问127.0.0.1:6795（指定的端口号），有多个api接口
-http://127.0.0.1:6795/get_a_proxy/30?u=user2&p=pass2  #指得是从最接近现在的检测时间的30个代理中随机返回一个。
+python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
+或者在 proxy_pool_config.py 文件中把配置写好，就不需要命令行来传参了。直接 python proxy_collector.py
+
+2)pycharm中打开此项目，可以直接右键点击run proxy_collector.py
+
+3)pip install proxypool_framework
+python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
+
 
 ```
 
@@ -102,10 +100,31 @@ FLASK_PORT = 6795  # 代理ip获取的接口
 
 
 ### 代理池维护的图片
+```
+代理池是sorted set结构，元素是代理ip本身，评分是该代理ip的最后一次的检测时间。
+
+流程是：
+
+有专门的n个独立线程去监控每个代理平台的页面，同时支持了分页监控。按照ProxyCollector对象的设置的时间来进行多久重新拉取一次代理ip，解析得到代理ip列表。
+
+使用了专门的线程池检测解析得到的代理ip列表，有效的跟新时间戳放到数据库，无效的丢弃。
+
+对于存量ip，检测完一轮后，休息1秒，然后扫描需要被重新检测的代理ip，如果一个存量代理的最后一次检测时间与当前时间差超过了 MAX_SECONDS_MUST_CHECK_AGAIN 则会重新检测，
+如果检测没有失效，则更新检测的时间戳为当前时间；如果检测失效了则删除。请求检测的requests timeout时间是使用 REQUESTS_TIMEOUT。一直高速循环检测。
+
+```
 ![Image text](https://i.niupic.com/images/2020/06/18/8hbZ.png)
 
 
 ### 随机统计检测代理池的质量
+```
+这是设置 MAX_SECONDS_MUST_CHECK_AGAIN=2 REQUESTS_TIMEOUT=1 配置的代理池维护的，然后取出来的随机测试结果。
+可以发现平均响应时间是1.5秒，只请求1次不做重试就成功的概率是98.5%。如果重试两次，可以保证成功率达到99.9%，这成功率足够可以秒杀任意收费代理。
+
+
+
+python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=2 REQUESTS_TIMEOUT=1 FLASK_PORT=6795
+```
 ![Image text](https://i.niupic.com/images/2020/06/18/8hbY.png)
 
 

@@ -76,7 +76,7 @@ def create_app():
         :return:
         """
         random_num = 100 if random_num > 100 else random_num  # 最大值100
-        proxy_dict = json.loads(random.choice(REDIS_CLIENT.zrevrange('proxy_free', 0, random_num)))
+        proxy_dict = json.loads(random.choice(REDIS_CLIENT.zrevrange(PROXY_KEY_IN_REDIS_DEFAULT, 0, random_num)))
         proxy_dict['http'] = proxy_dict['https'].replace('https', 'http')
         proxy_dict.pop('platform')
         proxy_str = json.dumps(proxy_dict, ensure_ascii=False)
@@ -86,7 +86,7 @@ def create_app():
     @app.route('/get_m_proxy/<int:bulk_num>')
     @auth_deco
     def get_many_proxy(bulk_num=10):
-        proxy_list = REDIS_CLIENT.zrevrange('proxy_free', 0, bulk_num)
+        proxy_list = REDIS_CLIENT.zrevrange(PROXY_KEY_IN_REDIS_DEFAULT, 0, bulk_num)
         proxy_list_hide_platform = list()
         for proxy_item in proxy_list:
             proxy_item_hide_platform = json.loads(proxy_item)
@@ -103,9 +103,9 @@ def create_app():
         :return:
         """
         # sep = request.args.get('sep','</br>')
-        # return sep.join([json.loads(proxy_str)['https'] for proxy_str in REDIS_CLIENT.zrevrange('proxy_free', 0, request.args.get('num',50))])
+        # return sep.join([json.loads(proxy_str)['https'] for proxy_str in REDIS_CLIENT.zrevrange(PROXY_KEY_IN_REDIS_DEFAULT, 0, request.args.get('num',50))])
 
-        response = make_response('\r\n'.join([json.loads(proxy_str)['https'].replace('https://', '') for proxy_str in REDIS_CLIENT.zrevrange('proxy_free', 0, request.args.get('num', 50))]))
+        response = make_response('\r\n'.join([json.loads(proxy_str)['https'].replace('https://', '') for proxy_str in REDIS_CLIENT.zrevrange(PROXY_KEY_IN_REDIS_DEFAULT, 0, request.args.get('num', 50))]))
         response.headers['Content-Type'] = 'text/plain; charset=utf-8'
         return response
 
@@ -113,7 +113,7 @@ def create_app():
     def statistic_ip_count_by_platform_name():
         platform___ip_count_map = defaultdict(int)
         ip__check_time_map = dict()
-        for proxy_str, timestamp in REDIS_CLIENT.zscan_iter('proxy_free', ):
+        for proxy_str, timestamp in REDIS_CLIENT.zscan_iter(PROXY_KEY_IN_REDIS_DEFAULT, ):
             proxy_dict = json.loads(proxy_str)
             ip__check_time_map[proxy_dict['https']] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp))
             platform___ip_count_map[proxy_dict['platform']] += 1
@@ -143,7 +143,7 @@ class ProxyCollector:
             return False
 
     def __init__(self, function_of_get_new_https_proxies_list_from_website, func_args=tuple(), func_kwargs: dict = None,
-                 platform_name='xx平台', redis_key='proxy_free',
+                 platform_name='xx平台', redis_key=PROXY_KEY_IN_REDIS_DEFAULT,
                  time_sleep_for_get_new_proxies=60,
                  ):
         """
@@ -220,13 +220,13 @@ if __name__ == '__main__':
     1)
     export PYTHONPATH=/codes/proxypool_framework （指的是你的代码的位置，codes换成你的位置） # 这个原理就不需解释了，不知道PYTHONPATH是什么就太low了。
     
-    python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795
+    python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
     或者在 proxy_pool_config.py 文件中把配置写好，就不需要命令行来传参了。直接 python proxy_collector.py
     
     2)pycharm中打开此项目，可以直接右键点击run proxy_collector.py
     
     3)pip install proxypool_framework
-    python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795
+    python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
     """
 
     os.system(f"""netstat -nltp|grep ':{FLASK_PORT} '|awk '{{print $NF}}'|awk -F/ '{{print $1}}'""")  # 杀死端口，避免ctrl c关闭不彻底，导致端口被占用。
