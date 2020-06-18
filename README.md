@@ -74,8 +74,8 @@ python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS
 python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
 
 也可以分两次启动，指定不同的redis默认键和flask 端口，
-弄一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间小的启动配置生成优质代理池维护在proxy1键中，数量少，成功率高。
-再启动一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间大的启动配置生成中等代理池维护在proxy2键中，数量多，成功率低。
+弄一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间小的启动配置,生成优质代理池维护在proxy1键中，数量少，成功率高。
+再启动一个 MAX_SECONDS_MUST_CHECK_AGAIN  REQUESTS_TIMEOUT 时间大的启动配置,生成中等代理池维护在proxy2键中，数量多，成功率低。
 
 
 启动后可以访问127.0.0.1:6795（指定的端口号），有多个api接口

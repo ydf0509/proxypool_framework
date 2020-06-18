@@ -223,13 +223,13 @@ if __name__ == '__main__':
     1)
     export PYTHONPATH=/codes/proxypool_framework （指的是你的代码的位置，codes换成你的位置） # 这个原理就不需解释了，不知道PYTHONPATH是什么就太low了。
     
-    python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
+    python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
     或者在 proxy_pool_config.py 文件中把配置写好，就不需要命令行来传参了。直接 python proxy_collector.py
     
     2)pycharm中打开此项目，可以直接右键点击run proxy_collector.py
     
     3)pip install proxypool_framework
-    python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS=proxy_free
+    python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
     """
 
     os.system(f"""netstat -nltp|grep ':{FLASK_PORT} '|awk '{{print $NF}}'|awk -F/ '{{print $1}}'""")  # 杀死端口，避免ctrl c关闭不彻底，导致端口被占用。
