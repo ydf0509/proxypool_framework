@@ -97,16 +97,16 @@ MAX_SECONDS_MUST_CHECK_AGAIN = 1 REQUESTS_TIMEOUT = 40，这种配置就相当�
 """
 MAX_SECONDS_MUST_CHECK_AGAIN = 2
 REQUESTS_TIMEOUT = 1  # 请求响应时间超过这个值，视为废物代理。
-FLASK_PORT = 6795  # 代理ip获取的接口。
+FLASK_PORT = 6795  # 代理ip获取的接口
 ```
 
 
 ### 代理池维护的图片
-
 ![Image text](https://i.niupic.com/images/2020/06/18/8hbZ.png)
 
 
 ### 随机统计检测代理池的质量
-
 ![Image text](https://i.niupic.com/images/2020/06/18/8hbY.png)
+
+
 

@@ -55,5 +55,5 @@ python setup.py sdist & twine upload dist/proxypool_framework-0.1.tar.gz
 twine upload dist/*
 
 
-python -m pip install proxypool_framework --upgrade -i https://pypi.org/simple   # 及时的方式，不用等待 阿里云 豆瓣 同步
+pip install proxypool_framework --upgrade -i https://pypi.org/simple   # 及时的方式，不用等待 阿里云 豆瓣 同步
 """
