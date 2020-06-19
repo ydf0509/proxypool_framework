@@ -4,6 +4,8 @@ proxypool_framework 是通用ip代理池架构 + 内置的20+ 个免费代理ip�
 从ip数量、ip质量、代理池实现本身的难度和代码行数、代理池扩展平台需要的代码行数和难度、配置方式、代理检测设计算法，
 是py史上最强的代理池，欢迎对比任意项目代理池项目，如果这不是最强的，可以写出理由反驳，并贴出更好代码的地址。
 
+使用方式如下，安装pip包，然后执行python -m proxypool_framework.proxy_collector 接一大串自定义的配置。（也可以拉取git使用）
+
 pip install proxypool_framework
 
 python -m proxypool_framework.proxy_collector REDIS_URL=redis:// 
@@ -135,8 +137,6 @@ PROXY_KEY_IN_REDIS_DEFAULT = 'proxy_free' # 默认的redis sorted set键，指�
 这是设置 MAX_SECONDS_MUST_CHECK_AGAIN=2 REQUESTS_TIMEOUT=1 配置的代理池维护的，然后取出来的随机测试结果。
 可以发现平均响应时间是1.5秒，只请求1次不做重试就成功的概率是98.5%。
 如果重试两次，可以保证成功率达到99.9%，这成功率足够可以秒杀任意收费代理。
-
-
 
 python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=2 REQUESTS_TIMEOUT=1 FLASK_PORT=6795 
 ```
