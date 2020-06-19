@@ -97,7 +97,8 @@ MAX_SECONDS_MUST_CHECK_AGAIN 的值要适当，过大会导致检测不及时，
 
 如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 2 REQUESTS_TIMEOUT = 1， 则会导致数据库检测及时，并且都是优质代理ip，但存量数量会有所减少（但数量还是秒杀任意收费代理），成功率和响应时间很好。
 如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 10 REQUESTS_TIMEOUT = 5， 这个是比较均衡的配置，兼容数量和质量。
-如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 30 REQUESTS_TIMEOUT = 10， 这个可以造成数据库中存量ip非常多，但有些代理ip响应时间长，随机使用成功率也会有所降低。
+如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 18 REQUESTS_TIMEOUT = 10， 这个可以造成数据库中存量ip多，但有些代理ip响应时间长，随机使用成功率也会有所降低。
+如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 30 REQUESTS_TIMEOUT = 20， 这样数量非常多。
 
 如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 1 REQUESTS_TIMEOUT = 40，这种配置就相当不好了，会造成存量大质量差，但又想检测密度高，会造成cpu消耗高。
 建议MAX_SECONDS_MUST_CHECK_AGAIN是REQUESTS_TIMEOUT的2倍。
