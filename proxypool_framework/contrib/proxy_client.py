@@ -1,13 +1,12 @@
 # coding=utf-8
 """
 改版包装requests的Session类，主要使用的是设计模式的代理模式（不是代理ip）,
-1、支持一键设置3种代理ip
 2、支持3种类型的cookie添加
 3、支持长会话，保持cookie状态
 4、支持一键设置requests请求重试次数，确保请求成功，默认重试一次。
 5、记录下当天的请求到文件，方便统计，同时开放了日志级别设置参数，用于禁止日志。
 6、从使用requests修改为使用ProxyClient门槛很低，三方包的request方法和此类的方法入参和返回完全100%保持了一致。
-7、支持代理运营商自动切换。需要将proxy_name设置为一个列表，指定多个代理的名字。
+
 
 user agent 大全 github  https://github.com/tamimibrahim17/List-of-user-agents/blob/master/user-agent.py
 user agent 网址 http://www.useragentstring.com/pages/useragentstring.php?name=Firefox
