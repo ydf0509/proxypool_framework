@@ -43,7 +43,8 @@ setup(
                       'nb_log',
                       'threadpool_executor_shrink_able',
                       'decorator_libs',
-                      'tornado'
+                      'tornado',
+                      'db_libs',
                       ]
 )
 """
