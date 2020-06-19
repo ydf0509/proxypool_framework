@@ -137,8 +137,6 @@ PROXY_KEY_IN_REDIS_DEFAULT = 'proxy_free' # 默认的redis sorted set键，指�
 可以发现平均响应时间是1.5秒，只请求1次不做重试就成功的概率是98.5%。
 如果重试两次，可以保证成功率达到99.9%，这成功率足够可以秒杀任意收费代理。
 
-
-
 python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=2 REQUESTS_TIMEOUT=1 FLASK_PORT=6795 
 ```
 ![Image text](https://i.niupic.com/images/2020/06/18/8hbY.png)
