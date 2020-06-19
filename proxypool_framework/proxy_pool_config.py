@@ -10,17 +10,17 @@ MAX_NUM_PROXY_IN_DB = 1000  # redis中存在超过这个代理数量后，将不
 """代理池是sorted set结构，键是ip,值是该ip最后一次的检测时间戳。一轮一轮的扫描，检测到存量代理ip的最后一次检测时间离现在超过这个时间就重新检测，否则此轮不检测此代理，
 MAX_SECONDS_MUST_CHECK_AGAIN 的值要适当，过大会导致检测不及时，取出来后使用时成功率变低；过小会导致检测存量代理ip的密度过大，当存量代理太多的时候，会导致cpu消耗高。
 
-如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 2 REQUESTS_TIMEOUT = 1， 则会导致数据库检测及时，并且都是优质代理ip，但存量数量会有所减少（但数量还是秒杀任意收费代理），成功率和响应时间很好。
+如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 2 REQUESTS_TIMEOUT = 1， 则数据库检测及时，并且都是响应速度快的优质代理ip，但存量数量会有所减少（但数量还是秒杀任意收费代理），成功率和响应时间很好。
 如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 10 REQUESTS_TIMEOUT = 5， 这个是比较均衡的配置，兼容数量和质量。
 如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 18 REQUESTS_TIMEOUT = 10， 这个可以造成数据库中存量ip多，但有些代理ip响应时间长，随机使用成功率也会有所降低。
 如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 30 REQUESTS_TIMEOUT = 20， 这样数量非常多。
 
 如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 1 REQUESTS_TIMEOUT = 40，这种配置就相当不好了，会造成存量大质量差，但又想检测密度高，会造成cpu消耗高。
-建议MAX_SECONDS_MUST_CHECK_AGAIN是REQUESTS_TIMEOUT的2倍，可以根据自己要数量大自己重试还是实时必须响应速度快进行不同的配置调优。
+建议MAX_SECONDS_MUST_CHECK_AGAIN是REQUESTS_TIMEOUT的 1-2 倍，可以根据自己要数量大自己重试还是实时必须响应速度快进行不同的配置调优。
 
 """
-MAX_SECONDS_MUST_CHECK_AGAIN = 2
-REQUESTS_TIMEOUT = 1  # 请求响应时间超过这个值，视为废物代理。
+MAX_SECONDS_MUST_CHECK_AGAIN = 10
+REQUESTS_TIMEOUT = 5  # 请求响应时间超过这个值，视为废物代理。
 FLASK_PORT = 6795  # 代理ip获取的接口。
 PROXY_KEY_IN_REDIS_DEFAULT = 'proxy_free' # 默认的redis sorted set键，指的是如果你不在ProxyCollector实例化时候亲自指定键的名字（主要是为了一次启动实现维护多个redis代理池）。
 

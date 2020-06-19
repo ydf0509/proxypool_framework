@@ -15,7 +15,7 @@ suceess_count = 0
 total_count = 0
 total_request_time = 0
 
-for i in range(10000):
+for i in range(1,10000):
     """
 
     本项目的public代理
@@ -42,7 +42,7 @@ for i in range(10000):
     except Exception as e:
         logger.warning(f'失败, 消耗时间{round(time.time() - t_start, 2)}，  代理是 \033[0;41m{pr}\033[0m')
     total_count += 1
-    if i % 10 == 0:
+    if i % 10 == 0 and total_count:
         logger.debug(f'当前请求总次数是 {total_count}， 成功次数是 {suceess_count} ,成功率是 {round((suceess_count / total_count) * 100, 3)}%, '
                      f'平均响应时间 {round(total_request_time / suceess_count, 2)}')
 
