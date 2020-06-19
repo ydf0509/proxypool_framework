@@ -30,7 +30,6 @@ from threadpool_executor_shrink_able import ThreadPoolExecutorShrinkAble
 
 from proxypool_framework.contrib.user_agents import pc_ua_lists, mobile_ua_lists
 
-
 warnings.simplefilter('ignore', category=urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -39,7 +38,6 @@ class HttpStatusError(Exception):
         super().__init__(f'请求返回的状态码是{http_status_code}')
 
 
-# noinspection PyBroadException
 class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
 
     def __init__(self, flask_addr='127.0.0.1:6795', redis_url='redis://', redis_proxy_key='proxy_free',
@@ -59,7 +57,7 @@ class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
         :param random_ua_list:
         :param request_retry_times:
         :param purpose: 请求用途
-        :param white_list_http_status_code:
+        :param white_list_http_status_code: 白名单状态码，例如403虽然请求没报错，但状态码不对，可以自动重试。例如假如206是正常现象，可以把206添加到白名单。
         """
         self._flask_addr = flask_addr
         self._redis_url = redis_url
