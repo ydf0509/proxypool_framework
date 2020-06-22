@@ -9,5 +9,8 @@ proxypool_framework.egg-info/SOURCES.txt
 proxypool_framework.egg-info/dependency_links.txt
 proxypool_framework.egg-info/requires.txt
 proxypool_framework.egg-info/top_level.txt
+proxypool_framework/contrib/__init__.py
+proxypool_framework/contrib/proxy_client.py
+proxypool_framework/contrib/user_agents.py
 proxypool_framework/tests/__init__.py
 proxypool_framework/tests/test_rate_of_success.py
