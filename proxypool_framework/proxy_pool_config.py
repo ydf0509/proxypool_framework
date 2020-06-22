@@ -19,8 +19,8 @@ MAX_SECONDS_MUST_CHECK_AGAIN 的值要适当，过大会导致检测不及时，
 建议MAX_SECONDS_MUST_CHECK_AGAIN是REQUESTS_TIMEOUT的 1-2 倍，可以根据自己要数量大自己重试还是实时必须响应速度快进行不同的配置调优。
 
 """
-MAX_SECONDS_MUST_CHECK_AGAIN = 5
-REQUESTS_TIMEOUT = 3  # 请求响应时间超过这个值，视为废物代理。
+MAX_SECONDS_MUST_CHECK_AGAIN = 10
+REQUESTS_TIMEOUT = 10  # 请求响应时间超过这个值，视为废物代理。
 FLASK_PORT = 6795  # 代理ip获取的接口。
 PROXY_KEY_IN_REDIS_DEFAULT = 'proxy_free' # 默认的redis sorted set键，指的是如果你不在ProxyCollector实例化时候亲自指定键的名字（主要是为了一次启动实现维护多个redis代理池）。
 
