@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: proxypool-framework
-Version: 0.6
+Version: 0.7
 Summary: proxypool_framework 是万能通用代理池架构，实现核心代码很少只有87行，同时想扩展一个代理平台仅需要写三行代码。通用代理池附带20+ 免费网站代理
 Home-page: UNKNOWN
 Author: bfzs
@@ -14,6 +14,12 @@ Description: # proxypool_framework
         从ip数量、ip质量、代理池实现本身的难度和代码行数、代理池扩展平台需要的代码行数和难度、配置方式、代理检测设计算法，
         是py史上最强的代理池，欢迎对比任意项目代理池项目，如果这不是最强的，可以写出理由反驳，并贴出更好代码的地址。
         
+        使用方式如下，安装pip包，然后执行python -m proxypool_framework.proxy_collector 接一大串自定义的配置。（也可以拉取git使用）
+        
+        pip install proxypool_framework
+        
+        python -m proxypool_framework.proxy_collector REDIS_URL=redis:// 
+        MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=10 REQUESTS_TIMEOUT=5 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
         
         ### 关于免费代理
         ```
@@ -101,12 +107,13 @@ Description: # proxypool_framework
         """代理池是sorted set结构，键是ip,值是该ip最后一次的检测时间戳。一轮一轮的扫描，检测到存量代理ip的最后一次检测时间离现在超过这个时间就重新检测，否则此轮不检测此代理，
         MAX_SECONDS_MUST_CHECK_AGAIN 的值要适当，过大会导致检测不及时，取出来后使用时成功率变低；过小会导致检测存量代理ip的密度过大，当存量代理太多的时候，会导致cpu消耗高。
         
-        MAX_SECONDS_MUST_CHECK_AGAIN = 2 REQUESTS_TIMEOUT = 1， 则会导致数据库检测及时，并且都是优质代理ip，但存量数量会有所减少（但数量还是秒杀任意收费代理），成功率和响应时间很好。
-        MAX_SECONDS_MUST_CHECK_AGAIN = 10 REQUESTS_TIMEOUT = 5， 这个是比较均衡的配置，兼容数量和质量。
-        MAX_SECONDS_MUST_CHECK_AGAIN = 30 REQUESTS_TIMEOUT = 10， 这个可以造成数据库中存量ip非常多，但有些代理ip响应时间长，随机使用成功率也会有所降低。
+        如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 2 REQUESTS_TIMEOUT = 1， 则会导致数据库检测及时，并且都是优质代理ip，但存量数量会有所减少（但数量还是秒杀任意收费代理），成功率和响应时间很好。
+        如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 10 REQUESTS_TIMEOUT = 5， 这个是比较均衡的配置，兼容数量和质量。
+        如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 18 REQUESTS_TIMEOUT = 10， 这个可以造成数据库中存量ip多，但有些代理ip响应时间长，随机使用成功率也会有所降低。
+        如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 30 REQUESTS_TIMEOUT = 20， 这样数量非常多。
         
-        MAX_SECONDS_MUST_CHECK_AGAIN = 1 REQUESTS_TIMEOUT = 40，这种配置就相当不好了，会造成存量大质量差，但又想检测密度高，会造成cpu消耗高。
-        建议MAX_SECONDS_MUST_CHECK_AGAIN是REQUESTS_TIMEOUT的2倍。
+        如果使 MAX_SECONDS_MUST_CHECK_AGAIN = 1 REQUESTS_TIMEOUT = 40，这种配置就相当不好了，会造成存量大质量差，但又想检测密度高，会造成cpu消耗高。
+        建议MAX_SECONDS_MUST_CHECK_AGAIN是REQUESTS_TIMEOUT的 1-2 倍，可以根据自己要数量大自己重试还是实时必须响应速度快进行不同的配置调优。
         
         """
         MAX_SECONDS_MUST_CHECK_AGAIN = 2
@@ -140,8 +147,6 @@ Description: # proxypool_framework
         这是设置 MAX_SECONDS_MUST_CHECK_AGAIN=2 REQUESTS_TIMEOUT=1 配置的代理池维护的，然后取出来的随机测试结果。
         可以发现平均响应时间是1.5秒，只请求1次不做重试就成功的概率是98.5%。
         如果重试两次，可以保证成功率达到99.9%，这成功率足够可以秒杀任意收费代理。
-        
-        
         
         python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=2 REQUESTS_TIMEOUT=1 FLASK_PORT=6795 
         ```
