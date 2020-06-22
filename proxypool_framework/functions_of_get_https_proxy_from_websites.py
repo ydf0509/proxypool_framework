@@ -13,21 +13,10 @@ import requests
 
 from proxypool_framework.proxy_pool_config import REDIS_CLIENT
 
-<<<<<<< HEAD
-logger_error_for_pull_ip = nb_log.LogManager('logger_error_for_pull_ip').get_logger_and_add_handlers(
-    log_filename='logger_error_for_pull_ip.log')
-=======
 logger_error_for_pull_ip = nb_log.LogManager('logger_error_for_pull_ip').get_logger_and_add_handlers(log_filename='logger_error_for_pull_ip.log')
 logger_normol_for_pull_ip = nb_log.LogManager('logger_normol_for_pull_ip').get_logger_and_add_handlers(log_filename='logger_normol_for_pull_ip.log')
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
 
-logger_normal_for_pull_ip = nb_log.LogManager('logger_normal_for_pull_ip').get_logger_and_add_handlers(
-    log_filename='logger_normal_for_pull_ip.log')
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
 def _request_use_proxy(method, url, headers=None):
     """
     有些代理获取网站本身就反扒，这样来请求。
@@ -43,24 +32,15 @@ def _request_use_proxy(method, url, headers=None):
     for i in range(10):
         try:
             proxy_list_in_db = REDIS_CLIENT.zrevrange('proxy_free', 0, 50)
-<<<<<<< HEAD
-            if not proxy_list_in_db or i %2 ==0 :
-                # logger_error_for_pull_ip.warning('proxy_free 键是空的或者代理太老了,将不使用代理ip请求三方代理网站')
-=======
             if not proxy_list_in_db:
                 logger_error_for_pull_ip.warning('proxy_free 键是空的，将不使用代理ip请求三方代理网站')
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
                 proxies = None
             else:
                 proxies_str = random.choice(proxy_list_in_db)
                 proxies = json.loads(proxies_str)
                 proxies['http'] = proxies['https'].replace('https', 'http')
-<<<<<<< HEAD
-
-=======
             if i % 2 == 0:
                 proxies = None
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
             return requests.request(method, url, headers=headers, proxies=proxies)
         except Exception as e:
             time.sleep(1)
@@ -85,11 +65,7 @@ def _check_ip_list(proxy_list: List[str]):
     [pool.submit(__check_a_ip_str, pr) for pr in proxy_list]
 
 
-<<<<<<< HEAD
-def _ensuer_extract_proxy_list_is_not_empty_deco(fun):
-=======
 def _ensure_proxy_list_is_not_empty_deco(fun):
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
     """
     亲测有时候页面请求没报错，但解析为空，但换代理ip请求可以得到ip列表。
     :param fun:
@@ -97,25 +73,6 @@ def _ensure_proxy_list_is_not_empty_deco(fun):
     """
 
     @wraps(fun)
-<<<<<<< HEAD
-    def __ensuer_extract_proxy_list_is_not_empty_deco(*args, **kwargs):
-        for i in range(6):
-            result = fun(*args, **kwargs)
-            if result:
-                if i != 0:
-                    logger_error_for_pull_ip.error(f'第 {i} 次 {fun.__name__} ,入参 [{args}  {kwargs}]，获取代理ip列表才正常')
-                logger_normal_for_pull_ip.debug(f'第{i}次重试  {fun.__name__}  ,入参 [{args}  {kwargs}]，获得的ip数量是  {len(result)}')
-                return result
-            else:
-                time.sleep(1)
-        logger_error_for_pull_ip.critical(f'{fun.__name__} 函数,入参 [{args}  {kwargs}]，重试了6次，仍然没解析到ip，请检查拉取反扒或者网站改版')
-        return []
-
-    return __ensuer_extract_proxy_list_is_not_empty_deco
-
-
-@_ensuer_extract_proxy_list_is_not_empty_deco
-=======
     def __ensure_proxy_list_is_not_empty_deco(*args, **kwargs):
         for i in range(7):
             result = fun(*args, **kwargs)
@@ -134,7 +91,6 @@ def _ensure_proxy_list_is_not_empty_deco(fun):
 
 
 @_ensure_proxy_list_is_not_empty_deco
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
 def get_https_proxies_list_from_xici_by_page(p=1):
     """
     十分垃圾，中等偏下。
@@ -146,11 +102,7 @@ def get_https_proxies_list_from_xici_by_page(p=1):
     return [f'{ip_port[0]}:{ip_port[1]}' for ip_port in ip_port_list]
 
 
-<<<<<<< HEAD
-@_ensuer_extract_proxy_list_is_not_empty_deco
-=======
 @_ensure_proxy_list_is_not_empty_deco
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
 def get_https_proxies_list_from_xila_https_by_page(p=1):
     """
     史上最好的免费代理网站
@@ -161,23 +113,18 @@ def get_https_proxies_list_from_xila_https_by_page(p=1):
     return re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}", resp.text)
 
 
-<<<<<<< HEAD
-@_ensuer_extract_proxy_list_is_not_empty_deco
-=======
 @_ensure_proxy_list_is_not_empty_deco
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
 def get_https_proxies_list_from_xila_gaoni_by_page(p=1):
     # 史上最好的免费代理网站
     resp = _request_use_proxy('get', f"http://www.xiladaili.com/gaoni/{p}")
     return re.findall(r"<td>(.*?)</td>\s*?<td>.*?HTTPS代理</td>", resp.text)
 
 
-@_ensuer_extract_proxy_list_is_not_empty_deco
 def get_89ip_proxies_list(p=1, ):
     """
     抓的可用性代理不到10%
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.89ip.cn/index_{p}.html')
@@ -189,7 +136,7 @@ def get_ip3366_proxies_list(p=1, ):
     """
     抓的https可用性代理可用性为0
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.ip3366.net/?stype=1&page={p}')
@@ -203,7 +150,7 @@ def get_kuaidailifree_proxies_list(p=1, ):
     """
     抓的快带理免费代理可用性为1%
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'https://www.kuaidaili.com/free/inha/{p}/')
@@ -216,7 +163,7 @@ def get_66ip_proxies_list(area=1, ):
     """
     抓的66免费代理，无效198 ，有效9
     :param area:城市，1到30
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.66ip.cn/areaindex_{area}/1.html')
@@ -224,11 +171,10 @@ def get_66ip_proxies_list(area=1, ):
     return [f'{"".join(ip.split())}:{"".join(port.split())}' for ip, port in ip_port_list]
 
 
-@_ensuer_extract_proxy_list_is_not_empty_deco
 def get_iphai_proxies_list():
     """
     抓的iphai代理，有效10，无效20
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.iphai.com')
@@ -240,7 +186,7 @@ def get_iphai_proxies_list():
 def get_mimvp_proxies_list(p, ):
     """
     抓的米扑代理，端口是图片。懒的搞。
-    
+
     :return:
     """
     return []
@@ -250,7 +196,7 @@ def get_kxdaili_proxies_list(p=1, ):
     """
     开心代理，可用性是0
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.kxdaili.com/dailiip/1/{p}.html')
@@ -264,7 +210,7 @@ def get_7yip_proxies_list(p=1, ):
     """
     齐云代理 有效2  无效58
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'https://www.7yip.cn/free/?action=china&page={p}')
@@ -278,7 +224,7 @@ def get_7yip_proxies_list(p=1, ):
 def get_xsdaili_proxies_list():
     """
     小舒代理，可用1，不可用98
-    
+
     :return:
     """
     url = 'http://www.xsdaili.cn/dayProxy/ip/2207.html'  # 测试时候要换成当天的页面url
@@ -287,17 +233,13 @@ def get_xsdaili_proxies_list():
             re.findall(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)@HTTP', resp.text)]
 
 
-<<<<<<< HEAD
-@_ensuer_extract_proxy_list_is_not_empty_deco
-=======
 @_ensure_proxy_list_is_not_empty_deco
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
 def get_nima_proxies_list(p=1, gaoni_or_https='gaoni', ):
     """
     又是一个非常犀利的网站。
     gaoni 或https
     有效81，无效93
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.nimadaili.com/{gaoni_or_https}/{p}/')
@@ -311,7 +253,7 @@ def get_proxylistplus_proxies_list(p=1, source='SSL-List', ):
     Fresh-HTTP-Proxy-List-2  有多页。
     :param p:
     :param source:
-    
+
     :return:
     """
     if source == 'SSL-List' and p > 1:
@@ -324,30 +266,25 @@ def get_proxylistplus_proxies_list(p=1, source='SSL-List', ):
 def get_from_seofangfa():
     """
     有效5 无效45
-    
+
     :return:
     """
     resp = _request_use_proxy('get', 'https://proxy.seofangfa.com/')
     return [f'{ip}:{port}' for ip, port in re.findall('<tr><td>(.*?)</td><td>(.*?)</td><td>', resp.text)]
 
 
-@_ensuer_extract_proxy_list_is_not_empty_deco
 def get_from_superfastip(p=1, ):
     """
     还可以。
     有效15 无效59
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'https://api.superfastip.com/ip/freeip?page={p}')
     return [f'{ip_port["ip"]}:{ip_port["port"]}' for ip_port in resp.json()['freeips']]
 
 
-<<<<<<< HEAD
-@_ensuer_extract_proxy_list_is_not_empty_deco
-=======
 @_ensure_proxy_list_is_not_empty_deco
->>>>>>> 29e9ac22b57a1c0539e075c76141fb1ef9ee1fc1
 def get_from_jiangxianli(p=1):
     """
     国外代理多。非常犀利的网站。
