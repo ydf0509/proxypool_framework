@@ -40,7 +40,7 @@ class HttpStatusError(Exception):
 
 class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
 
-    def __init__(self, flask_addr='127.0.0.1:6795', redis_url='redis://', redis_proxy_key='proxy_free',
+    def __init__(self, flask_addr='127.0.0.1:6795', redis_url='redis://:123456@', redis_proxy_key='proxy_free',
                  is_priority_get_proxy_from_redis=True, is_use_proxy=True, ua=None, default_use_pc_ua=True,
                  is_change_ua_every_request=False, random_ua_list: list = None,
                  request_retry_times=2, purpose='',
@@ -160,11 +160,17 @@ class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
         proxy_dict = None
         if self._is_use_proxy:
             if self._is_priority_get_proxy_from_redis:
+<<<<<<< HEAD
+=======
+                proxy_dict = json.loads(self.ss.request('get', f'http://{self._flask_addr}/get_a_proxy/30?u=user2&p=pass2',).text)
+            else:
+                # print(random.choice(redis2_from_url(self._redis_url).zrevrange('proxy_free', 0, 30)))
+>>>>>>> e44d558654d6abe1aa5629bd3c864b70e8322760
                 proxy_dict = json.loads(random.choice(redis2_from_url(self._redis_url).zrevrange('proxy_free', 0, 30)))
             else:
                 proxy_dict = json.loads(self.ss.request('get', f'http://{self._flask_addr}/get_a_proxy/30?u=user2&p=pass2').text)
             proxy_dict['http'] = proxy_dict['https'].replace('https', 'http')
-        self.logger.debug(proxy_dict)
+        # self.logger.debug(proxy_dict)
         return proxy_dict
 
     # noinspection PyProtectedMember

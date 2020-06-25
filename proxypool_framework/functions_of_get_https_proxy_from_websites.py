@@ -124,7 +124,7 @@ def get_89ip_proxies_list(p=1, ):
     """
     抓的可用性代理不到10%
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.89ip.cn/index_{p}.html')
@@ -136,7 +136,7 @@ def get_ip3366_proxies_list(p=1, ):
     """
     抓的https可用性代理可用性为0
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.ip3366.net/?stype=1&page={p}')
@@ -150,7 +150,7 @@ def get_kuaidailifree_proxies_list(p=1, ):
     """
     抓的快带理免费代理可用性为1%
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'https://www.kuaidaili.com/free/inha/{p}/')
@@ -163,7 +163,7 @@ def get_66ip_proxies_list(area=1, ):
     """
     抓的66免费代理，无效198 ，有效9
     :param area:城市，1到30
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.66ip.cn/areaindex_{area}/1.html')
@@ -174,7 +174,7 @@ def get_66ip_proxies_list(area=1, ):
 def get_iphai_proxies_list():
     """
     抓的iphai代理，有效10，无效20
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.iphai.com')
@@ -186,7 +186,7 @@ def get_iphai_proxies_list():
 def get_mimvp_proxies_list(p, ):
     """
     抓的米扑代理，端口是图片。懒的搞。
-    
+
     :return:
     """
     return []
@@ -196,7 +196,7 @@ def get_kxdaili_proxies_list(p=1, ):
     """
     开心代理，可用性是0
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.kxdaili.com/dailiip/1/{p}.html')
@@ -210,7 +210,7 @@ def get_7yip_proxies_list(p=1, ):
     """
     齐云代理 有效2  无效58
     :param p:
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'https://www.7yip.cn/free/?action=china&page={p}')
@@ -224,7 +224,7 @@ def get_7yip_proxies_list(p=1, ):
 def get_xsdaili_proxies_list():
     """
     小舒代理，可用1，不可用98
-    
+
     :return:
     """
     url = 'http://www.xsdaili.cn/dayProxy/ip/2207.html'  # 测试时候要换成当天的页面url
@@ -239,7 +239,7 @@ def get_nima_proxies_list(p=1, gaoni_or_https='gaoni', ):
     又是一个非常犀利的网站。
     gaoni 或https
     有效81，无效93
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'http://www.nimadaili.com/{gaoni_or_https}/{p}/')
@@ -253,7 +253,7 @@ def get_proxylistplus_proxies_list(p=1, source='SSL-List', ):
     Fresh-HTTP-Proxy-List-2  有多页。
     :param p:
     :param source:
-    
+
     :return:
     """
     if source == 'SSL-List' and p > 1:
@@ -266,7 +266,7 @@ def get_proxylistplus_proxies_list(p=1, source='SSL-List', ):
 def get_from_seofangfa():
     """
     有效5 无效45
-    
+
     :return:
     """
     resp = _request_use_proxy('get', 'https://proxy.seofangfa.com/')
@@ -277,7 +277,7 @@ def get_from_superfastip(p=1, ):
     """
     还可以。
     有效15 无效59
-    
+
     :return:
     """
     resp = _request_use_proxy('get', f'https://api.superfastip.com/ip/freeip?page={p}')
