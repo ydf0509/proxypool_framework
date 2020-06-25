@@ -14,6 +14,7 @@ user agent 网址 http://www.useragentstring.com/pages/useragentstring.php?name=
 import json
 import random
 import copy
+import re
 import sys
 import warnings
 from typing import Union
@@ -79,7 +80,7 @@ class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
         self.prxoy_from_info = ''
         if is_use_proxy:
             if is_priority_get_proxy_from_redis:
-                self.prxoy_from_info = f'从redis {redis_url} {redis_proxy_key} 获取的代理'
+                self.prxoy_from_info = f'从redis {re.sub("redis://:(.*?)@","***",redis_url)} {redis_proxy_key} 获取的代理'
             else:
                 self.prxoy_from_info = f'从flask {flask_addr}  获取的代理'
         else:
@@ -159,9 +160,9 @@ class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
         proxy_dict = None
         if self._is_use_proxy:
             if self._is_priority_get_proxy_from_redis:
-                proxy_dict = json.loads(self.ss.request('get', f'http://{self._flask_addr}/get_a_proxy/30?u=user2&p=pass2').text)
-            else:
                 proxy_dict = json.loads(random.choice(redis2_from_url(self._redis_url).zrevrange('proxy_free', 0, 30)))
+            else:
+                proxy_dict = json.loads(self.ss.request('get', f'http://{self._flask_addr}/get_a_proxy/30?u=user2&p=pass2').text)
             proxy_dict['http'] = proxy_dict['https'].replace('https', 'http')
         self.logger.debug(proxy_dict)
         return proxy_dict
