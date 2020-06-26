@@ -279,4 +279,4 @@ if __name__ == '__main__':
     #     pc.request('get', 'https://www.baidu.com')
     #     pc.request('get', 'https://www.baidu.com')
     # ProxyClient().pressure_test('get', 'https://www.baidu.com/content-search.xml', threads_num=200, )
-    ProxyClient(is_priority_get_proxy_from_redis=False, flask_addr='106.55.244.110:6795').statistic_rate_of_sucess()
+    ProxyClient(is_priority_get_proxy_from_redis=False, flask_addr='106.55.244.110:6795').statistic_rate_of_sucess() 
