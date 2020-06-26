@@ -45,6 +45,8 @@ setup(
                       'decorator_libs',
                       'tornado',
                       'db_libs',
+                      'requests',
+                      'urllib3',
                       ]
 )
 """
