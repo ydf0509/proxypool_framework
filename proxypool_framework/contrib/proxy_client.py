@@ -266,7 +266,8 @@ class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
                     # print(resp.text[:10])
                 except Exception as e:
                     if j == self._max_request_retry_times:
-                        self.logger.warning(f'重试了 {self._max_request_retry_times}次后仍然失败, 消耗时间{round(time.time() - t_start, 2)}，  代理是 \033[0;41m{pr}\033[0m，错误类型是 {type(e)}')
+                        self.logger.warning(f'重试了 {self._max_request_retry_times}次后仍然失败, 消耗时间{round(time.time() - t_start, 2)}， '
+                                            f' 代理是 \033[0;41m{pr}\033[0m，错误类型是 {type(e)}')
 
             total_count += 1
             if total_count % 10 == 0 and total_count:
