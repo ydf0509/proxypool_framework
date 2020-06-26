@@ -11,7 +11,7 @@ print(filepath)
 
 setup(
     name='proxypool_framework',  #
-    version="0.7",
+    version="0.9",
     description=(
         'proxypool_framework 是万能通用代理池架构，实现核心代码很少只有87行，同时想扩展一个代理平台仅需要写三行代码。通用代理池附带20+ 免费网站代理'
     ),
@@ -52,7 +52,7 @@ setup(
 python setup.py sdist upload -r pypi
 
 
-python setup.py sdist & twine upload dist/proxypool_framework-0.7.tar.gz
+python setup.py sdist & twine upload dist/proxypool_framework-0.9.tar.gz
 twine upload dist/*
 
 
