@@ -39,7 +39,7 @@ class HttpStatusError(Exception):
 
 class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
 
-    def __init__(self, flask_addr='127.0.0.1:6795', redis_url='redis://:123456@', redis_proxy_key='proxy_free',
+    def __init__(self, flask_addr='127.0.0.1:6795', redis_url='redis://:@', redis_proxy_key='proxy_free',
                  is_priority_get_proxy_from_redis=True, is_use_proxy=True, ua=None, default_use_pc_ua=True,
                  is_change_ua_every_request=False, random_ua_list: list = None,
                  request_retry_times=2, purpose='',
@@ -280,4 +280,4 @@ if __name__ == '__main__':
     #     pc.request('get', 'https://www.baidu.com')
     #     pc.request('get', 'https://www.baidu.com')
     # ProxyClient().pressure_test('get', 'https://www.baidu.com/content-search.xml', threads_num=200, )
-    ProxyClient(is_priority_get_proxy_from_redis=False, flask_addr='106.55.244.110:6795').statistic_rate_of_sucess()
+    ProxyClient().statistic_rate_of_sucess()

@@ -42,6 +42,7 @@ for g_var in globals_copy:
 REDIS_CLIENT = redis2.from_url(REDIS_URL)
 REDIS_CLIENT.ping()  # 测试账号密码错误没有。
 
+# 运行时候的配置写入到redis，免得以后忘了，当初是什么配置参数维护的代理池。
 REDIS_CLIENT.hset('proxy_key_run_config', PROXY_KEY_IN_REDIS_DEFAULT, json.dumps({
     'MAX_NUM_PROXY_IN_DB': MAX_NUM_PROXY_IN_DB,
     'MAX_SECONDS_MUST_CHECK_AGAIN': MAX_SECONDS_MUST_CHECK_AGAIN,
