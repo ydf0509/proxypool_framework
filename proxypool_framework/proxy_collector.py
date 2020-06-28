@@ -150,7 +150,7 @@ class ProxyCollector:
 
     def __init__(self, function_of_get_new_https_proxies_list_from_website, func_args=tuple(), func_kwargs: dict = None,
                  platform_name='xx平台', redis_key=PROXY_KEY_IN_REDIS_DEFAULT,
-                 time_sleep_for_get_new_proxies=60,
+                 time_sleep_for_get_new_proxies=60, is_add_proxy_collector_property_to_list=True,
                  ):
         """
         :param function_of_get_new_https_proxies_list_from_website: 獲取代理ip列表的函數，使用策略模式。
@@ -158,8 +158,10 @@ class ProxyCollector:
         """
         locals_copy = copy.copy(locals())
         locals_copy.pop('self')
-        print(locals_copy)
-        self.proxy_collector_property_list.append(locals_copy)
+        locals_copy.pop('is_add_proxy_collector_property_to_list')
+        if is_add_proxy_collector_property_to_list:
+            print(locals_copy)
+            self.proxy_collector_property_list.append(locals_copy)
 
         self.function_of_get_new_https_proxies_list_from_website = function_of_get_new_https_proxies_list_from_website
         self._func_args = func_args
@@ -178,17 +180,18 @@ class ProxyCollector:
         else:
             self.logger.warning(f'新拉取的 {self.platform_name} 平台 代理无效')
 
-    def _check_all_new_proxies(self):
+    def _check_all_new_proxies(self, pool=None):
         """
         并发检测新代理，有效的入库
         :return:
         """
+        pool = pool or self.pool_for_check_new
         exists_num_in_db = REDIS_CLIENT.zcard(self._redis_key)
         if exists_num_in_db < MAX_NUM_PROXY_IN_DB:
-            self.pool_for_check_new.map(self.__check_a_new_proxy_and_add_to_database,
-                                        [{'https': f'https://{ip}', 'platform': self.platform_name} for ip in
-                                         self.function_of_get_new_https_proxies_list_from_website(
-                                             *self._func_args, **self._func_kwargs)])
+            pool.map(self.__check_a_new_proxy_and_add_to_database,
+                     [{'https': f'https://{ip}', 'platform': self.platform_name} for ip in
+                      self.function_of_get_new_https_proxies_list_from_website(
+                          *self._func_args, **self._func_kwargs)])
         else:
             self.logger.critical(
                 f'{self._redis_key} 键中的代理ip数量为 {exists_num_in_db},超过了制定阈值 {MAX_NUM_PROXY_IN_DB},此次循环暂时不拉取新代理')
@@ -225,14 +228,15 @@ class ProxyCollector:
 
 def function_for_extra_check_pull_new_ips_with_multi_processing(proxy_collector_property_list):
     """
-    额外的拉新进程，更多的进程可以拉取更多的代理，兼容linux和win。
+    额外的拉新进程，更多的进程可以拉取检测更多的代理，兼容linux和win。
     :param proxy_collector_property_list:
     :return:
     """
+    poolx = BoundedThreadPoolExecutor(200)
     for proxy_collector_property in proxy_collector_property_list:
-        proxy_collctor_x = ProxyCollector(**proxy_collector_property)
+        proxy_collctor_x = ProxyCollector(**proxy_collector_property,is_add_proxy_collector_property_to_list=False)
         decorator_libs.keep_circulating(proxy_collctor_x._time_sleep_for_get_new_proxies, block=False)(
-            proxy_collctor_x._check_all_new_proxies)()
+            proxy_collctor_x._check_all_new_proxies)(pool=poolx)
         print(proxy_collector_property)
     while 1:
         time.sleep(3600)
@@ -253,6 +257,7 @@ if __name__ == '__main__':
     3)pip install proxypool_framework
     python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
     """
+    # os.system(f"""ps -aux|grep FLASK_PORT={FLASK_PORT}|grep -v grep|awk '{{print $2}}' |xargs kill -9""")  # 杀死端口，避免ctrl c关闭不彻底，导致端口被占用。
 
     """启动代理池自动持续维护"""
     ProxyCollector(get_iphai_proxies_list, platform_name='iphai', time_sleep_for_get_new_proxies=70, ).work()
@@ -279,7 +284,6 @@ if __name__ == '__main__':
     [Process(target=function_for_extra_check_pull_new_ips_with_multi_processing, args=(ProxyCollector.proxy_collector_property_list,)).start()
      for _ in range(EXTRA_CHECK_PULL_NEW_IPS_PROCESS_NUM)]
 
-    os.system(f"""ps -aux|grep FLASK_PORT={FLASK_PORT}|grep -v grep|awk '{{print $2}}' |xargs kill -9""")  # 杀死端口，避免ctrl c关闭不彻底，导致端口被占用。
     """启动api"""
     http_server = HTTPServer(WSGIContainer(create_app()))
     http_server.listen(FLASK_PORT)
