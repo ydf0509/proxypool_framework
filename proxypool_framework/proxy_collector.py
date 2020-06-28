@@ -8,6 +8,7 @@ import urllib3
 # noinspection PyUnresolvedReferences
 import random
 from nb_log import LogManager
+from multiprocessing import Process
 # noinspection PyUnresolvedReferences
 from threadpool_executor_shrink_able import BoundedThreadPoolExecutor
 import decorator_libs
@@ -127,11 +128,13 @@ def create_app():
 
 
 class ProxyCollector:
-    pool_for_check_new = BoundedThreadPoolExecutor(50)
+    pool_for_check_new = BoundedThreadPoolExecutor(100)
     pool_for_check_exists = BoundedThreadPoolExecutor(200)
     redis_key___has_start_check_exists_proxies_in_database_map = dict()
     logger_for_check_exists = LogManager('ProxyCollector-check_exists').get_logger_and_add_handlers(
         log_filename=f'ProxyCollector-check_exists.log', formatter_template=7)
+
+    proxy_collector_property_list = list()
 
     @staticmethod
     def check_proxy_validity(proxy_dict: dict):
@@ -153,6 +156,10 @@ class ProxyCollector:
         :param function_of_get_new_https_proxies_list_from_website: 獲取代理ip列表的函數，使用策略模式。
         :param time_sleep_for_get_new_proxies:
         """
+        locals_copy = copy.copy(locals())
+        locals_copy.pop('self')
+        print(locals_copy)
+        self.proxy_collector_property_list.append(locals_copy)
 
         self.function_of_get_new_https_proxies_list_from_website = function_of_get_new_https_proxies_list_from_website
         self._func_args = func_args
@@ -216,6 +223,21 @@ class ProxyCollector:
             self._check_all_new_proxies)()
 
 
+def function_for_extra_check_pull_new_ips_with_multi_processing(proxy_collector_property_list):
+    """
+    额外的拉新进程，更多的进程可以拉取更多的代理，兼容linux和win。
+    :param proxy_collector_property_list:
+    :return:
+    """
+    for proxy_collector_property in proxy_collector_property_list:
+        proxy_collctor_x = ProxyCollector(**proxy_collector_property)
+        decorator_libs.keep_circulating(proxy_collctor_x._time_sleep_for_get_new_proxies, block=False)(
+            proxy_collctor_x._check_all_new_proxies)()
+        print(proxy_collector_property)
+    while 1:
+        time.sleep(3600)
+
+
 if __name__ == '__main__':
     """初次运行时候由于redis中没有代理ip做爬取第三方网站的引子，会被免费代理网站反爬，ip在前几分钟内会比较少。之后会增多，耐心等待。
     
@@ -232,7 +254,6 @@ if __name__ == '__main__':
     python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
     """
 
-    os.system(f"""netstat -nltp|grep ':{FLASK_PORT} '|awk '{{print $NF}}'|awk -F/ '{{print $1}}'""")  # 杀死端口，避免ctrl c关闭不彻底，导致端口被占用。
     """启动代理池自动持续维护"""
     ProxyCollector(get_iphai_proxies_list, platform_name='iphai', time_sleep_for_get_new_proxies=70, ).work()
     ProxyCollector(get_from_seofangfa, platform_name='seofangfa', time_sleep_for_get_new_proxies=70, ).work()
@@ -255,6 +276,10 @@ if __name__ == '__main__':
         ProxyCollector(get_nima_proxies_list, (p, 'https'), platform_name='nima', time_sleep_for_get_new_proxies=time_sleep_for_get_new_proxiesx).work()
         ProxyCollector(get_from_jiangxianli, func_kwargs={'p': p}, platform_name='jiangxianli', time_sleep_for_get_new_proxies=time_sleep_for_get_new_proxiesx).work()
 
+    [Process(target=function_for_extra_check_pull_new_ips_with_multi_processing, args=(ProxyCollector.proxy_collector_property_list,)).start()
+     for _ in range(EXTRA_CHECK_PULL_NEW_IPS_PROCESS_NUM)]
+
+    os.system(f"""ps -aux|grep FLASK_PORT={FLASK_PORT}|grep -v grep|awk '{{print $2}}' |xargs kill -9""")  # 杀死端口，避免ctrl c关闭不彻底，导致端口被占用。
     """启动api"""
     http_server = HTTPServer(WSGIContainer(create_app()))
     http_server.listen(FLASK_PORT)

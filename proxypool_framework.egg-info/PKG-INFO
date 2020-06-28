@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: proxypool-framework
-Version: 1.0
+Version: 1.1
 Summary: proxypool_framework 是万能通用代理池架构，实现核心代码很少只有87行，同时想扩展一个代理平台仅需要写三行代码。通用代理池附带20+ 免费网站代理
 Home-page: UNKNOWN
 Author: bfzs
