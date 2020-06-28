@@ -14,7 +14,6 @@ user agent 网址 http://www.useragentstring.com/pages/useragentstring.php?name=
 import json
 import random
 import copy
-import re
 import sys
 import warnings
 from typing import Union
@@ -80,7 +79,7 @@ class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
         self.prxoy_from_info = ''
         if is_use_proxy:
             if is_priority_get_proxy_from_redis:
-                self.prxoy_from_info = f'从redis {re.sub("redis://:(.*?)@","***",redis_url)} {redis_proxy_key} 获取的代理'
+                self.prxoy_from_info = f'从redis {redis_url} {redis_proxy_key} 获取的代理'
             else:
                 self.prxoy_from_info = f'从flask {flask_addr}  获取的代理'
         else:
@@ -160,15 +159,9 @@ class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
         proxy_dict = None
         if self._is_use_proxy:
             if self._is_priority_get_proxy_from_redis:
-<<<<<<< HEAD
-=======
-                proxy_dict = json.loads(self.ss.request('get', f'http://{self._flask_addr}/get_a_proxy/30?u=user2&p=pass2',).text)
-            else:
-                # print(random.choice(redis2_from_url(self._redis_url).zrevrange('proxy_free', 0, 30)))
->>>>>>> e44d558654d6abe1aa5629bd3c864b70e8322760
                 proxy_dict = json.loads(random.choice(redis2_from_url(self._redis_url).zrevrange('proxy_free', 0, 30)))
             else:
-                proxy_dict = json.loads(self.ss.request('get', f'http://{self._flask_addr}/get_a_proxy/30?u=user2&p=pass2').text)
+                proxy_dict = json.loads(self.ss.request('get', f'http://{self._flask_addr}/get_a_proxy/30?u=user2&p=pass2', ).text)
             proxy_dict['http'] = proxy_dict['https'].replace('https', 'http')
         # self.logger.debug(proxy_dict)
         return proxy_dict
@@ -255,9 +248,36 @@ class ProxyClient(LoggerMixinDefaultWithFileHandler, LoggerLevelSetterMixin):
         while 1:
             pool.submit(__pressure_test_url)
 
+    def statistic_rate_of_sucess(self):
+        suceess_count = 0
+        total_count = 0
+        total_request_time = 0
+
+        while 1:
+            t_start = time.time()
+            for j in range(0, self._max_request_retry_times + 1):
+                pr = self.get_a_proxy()
+                try:
+                    resp = requests.get('https://ydgf.sohu.com/schedule/index.json', proxies=pr, timeout=5)
+                    self.logger.info(f'重试 {j} 次请求成功, 消耗时间 {round(time.time() - t_start, 2)}，  代理是 \033[0;41m{pr}\033[0m ，结果长度是 {len(resp.text)}')
+                    suceess_count += 1
+                    total_request_time += time.time() - t_start
+                    break
+                    # print(resp.text[:10])
+                except Exception as e:
+                    if j == self._max_request_retry_times:
+                        self.logger.warning(f'重试了 {self._max_request_retry_times}次后仍然失败, 消耗时间{round(time.time() - t_start, 2)}， '
+                                            f' 代理是 \033[0;41m{pr}\033[0m，错误类型是 {type(e)}')
+
+            total_count += 1
+            if total_count % 10 == 0 and total_count:
+                self.logger.debug(f'当前请求总次数是 {total_count}， 成功次数是 {suceess_count} ,成功率是 {round((suceess_count / total_count) * 100, 3)}%, '
+                                  f'平均响应时间 {round(total_request_time / suceess_count, 2)}')
+
 
 if __name__ == '__main__':
-    with ProxyClient(is_priority_get_proxy_from_redis=False) as pc:
-        pc.request('get', 'https://www.baidu.com')
-        pc.request('get', 'https://www.baidu.com')
-    ProxyClient().pressure_test('get', 'https://www.baidu.com/content-search.xml', threads_num=200, )
+    # with ProxyClient(is_priority_get_proxy_from_redis=False) as pc:
+    #     pc.request('get', 'https://www.baidu.com')
+    #     pc.request('get', 'https://www.baidu.com')
+    # ProxyClient().pressure_test('get', 'https://www.baidu.com/content-search.xml', threads_num=200, )
+    ProxyClient(is_priority_get_proxy_from_redis=False, flask_addr='106.55.244.110:6795').statistic_rate_of_sucess()
