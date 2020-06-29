@@ -134,7 +134,7 @@ class ProxyCollector:
     logger_for_check_exists = LogManager('ProxyCollector-check_exists').get_logger_and_add_handlers(
         log_filename=f'ProxyCollector-check_exists.log', formatter_template=7)
 
-    proxy_collector_property_list = list()
+    proxy_collector_property_list = list()  # type: List(dict)
 
     @staticmethod
     def check_proxy_validity(proxy_dict: dict):
@@ -158,9 +158,8 @@ class ProxyCollector:
         """
         locals_copy = copy.copy(locals())
         locals_copy.pop('self')
-        locals_copy.pop('is_add_proxy_collector_property_to_list')
         if is_add_proxy_collector_property_to_list:
-            print(locals_copy)
+            # print(locals_copy)
             self.proxy_collector_property_list.append(locals_copy)
 
         self.function_of_get_new_https_proxies_list_from_website = function_of_get_new_https_proxies_list_from_website
@@ -228,13 +227,14 @@ class ProxyCollector:
 
 def function_for_extra_check_pull_new_ips_with_multi_processing(proxy_collector_property_list):
     """
-    额外的拉新进程，更多的进程可以拉取检测更多的代理，兼容linux和win。
+    额外的拉新代理进程，更多的进程可以拉取检测更多的代理，兼容linux和win。这是可选的运行项目。
     :param proxy_collector_property_list:
     :return:
     """
     poolx = BoundedThreadPoolExecutor(200)
     for proxy_collector_property in proxy_collector_property_list:
-        proxy_collctor_x = ProxyCollector(**proxy_collector_property,is_add_proxy_collector_property_to_list=False)
+        proxy_collector_property['is_add_proxy_collector_property_to_list'] = False
+        proxy_collctor_x = ProxyCollector(**proxy_collector_property, )
         decorator_libs.keep_circulating(proxy_collctor_x._time_sleep_for_get_new_proxies, block=False)(
             proxy_collctor_x._check_all_new_proxies)(pool=poolx)
         print(proxy_collector_property)
