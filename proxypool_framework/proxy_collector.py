@@ -134,8 +134,6 @@ class ProxyCollector:
     logger_for_check_exists = LogManager('ProxyCollector-check_exists').get_logger_and_add_handlers(
         log_filename=f'ProxyCollector-check_exists.log', formatter_template=7)
 
-
-
     @staticmethod
     def check_proxy_validity(proxy_dict: dict):
         # noinspection PyUnusedLocal
@@ -217,7 +215,6 @@ class ProxyCollector:
                 self._check_exists_proxies_in_database)()
         decorator_libs.keep_circulating(self._time_sleep_for_get_new_proxies, block=False)(
             self._check_all_new_proxies)()
-
 
 
 if __name__ == '__main__':
