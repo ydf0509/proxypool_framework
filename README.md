@@ -9,7 +9,7 @@ proxypool_framework 是通用ip代理池架构 + 内置的20+ 个免费代理ip�
 pip install proxypool_framework
 
 python -m proxypool_framework.proxy_collector REDIS_URL=redis:// 
-MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=10 REQUESTS_TIMEOUT=5 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free EXTRA_CHECK_PULL_NEW_IPS_PROCESS_NUM=4 
+MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=10 REQUESTS_TIMEOUT=5 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free 
 
 ### 关于免费代理
 ```

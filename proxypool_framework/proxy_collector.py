@@ -73,7 +73,7 @@ def create_app():
     @app.route('/get_a_proxy/')
     @app.route('/get_a_proxy/<int:random_num>')
     @auth_deco
-    def get_a_proxy(random_num=50):
+    def get_a_proxy(random_num=30):
         """
         :param random_num: 在最后一次检测可用性时间的最接近现在时间的多少个ip范围内随机返回一个ip.数字范围越小，最后检测时间的随机范围越靠近当前时间。
         此代理池通用架构，可以实现超高的检测频率，基本上任何时刻每秒钟都有几十个比当前时间错小一两秒的。比当前时间戳小10秒的有几百个代理。
@@ -134,7 +134,7 @@ class ProxyCollector:
     logger_for_check_exists = LogManager('ProxyCollector-check_exists').get_logger_and_add_handlers(
         log_filename=f'ProxyCollector-check_exists.log', formatter_template=7)
 
-    proxy_collector_property_list = list()  # type: List(dict)
+
 
     @staticmethod
     def check_proxy_validity(proxy_dict: dict):
@@ -150,18 +150,12 @@ class ProxyCollector:
 
     def __init__(self, function_of_get_new_https_proxies_list_from_website, func_args=tuple(), func_kwargs: dict = None,
                  platform_name='xx平台', redis_key=PROXY_KEY_IN_REDIS_DEFAULT,
-                 time_sleep_for_get_new_proxies=60, is_add_proxy_collector_property_to_list=True,
+                 time_sleep_for_get_new_proxies=60,
                  ):
         """
         :param function_of_get_new_https_proxies_list_from_website: 獲取代理ip列表的函數，使用策略模式。
         :param time_sleep_for_get_new_proxies:
         """
-        locals_copy = copy.copy(locals())
-        locals_copy.pop('self')
-        if is_add_proxy_collector_property_to_list:
-            # print(locals_copy)
-            self.proxy_collector_property_list.append(locals_copy)
-
         self.function_of_get_new_https_proxies_list_from_website = function_of_get_new_https_proxies_list_from_website
         self._func_args = func_args
         self._func_kwargs = func_kwargs or {}
@@ -225,22 +219,6 @@ class ProxyCollector:
             self._check_all_new_proxies)()
 
 
-def function_for_extra_check_pull_new_ips_with_multi_processing(proxy_collector_property_list):
-    """
-    额外的拉新代理进程，更多的进程可以拉取检测更多的代理，兼容linux和win。这是可选的运行项目。
-    :param proxy_collector_property_list:
-    :return:
-    """
-    poolx = BoundedThreadPoolExecutor(200)
-    for proxy_collector_property in proxy_collector_property_list:
-        proxy_collector_property['is_add_proxy_collector_property_to_list'] = False
-        proxy_collctor_x = ProxyCollector(**proxy_collector_property, )
-        decorator_libs.keep_circulating(proxy_collctor_x._time_sleep_for_get_new_proxies, block=False)(
-            proxy_collctor_x._check_all_new_proxies)(pool=poolx)
-        print(proxy_collector_property)
-    while 1:
-        time.sleep(3600)
-
 
 if __name__ == '__main__':
     """初次运行时候由于redis中没有代理ip做爬取第三方网站的引子，会被免费代理网站反爬，ip在前几分钟内会比较少。之后会增多，耐心等待。
@@ -280,9 +258,6 @@ if __name__ == '__main__':
         ProxyCollector(get_nima_proxies_list, (p, 'gaoni'), platform_name='nima', time_sleep_for_get_new_proxies=time_sleep_for_get_new_proxiesx).work()
         ProxyCollector(get_nima_proxies_list, (p, 'https'), platform_name='nima', time_sleep_for_get_new_proxies=time_sleep_for_get_new_proxiesx).work()
         ProxyCollector(get_from_jiangxianli, func_kwargs={'p': p}, platform_name='jiangxianli', time_sleep_for_get_new_proxies=time_sleep_for_get_new_proxiesx).work()
-
-    [Process(target=function_for_extra_check_pull_new_ips_with_multi_processing, args=(ProxyCollector.proxy_collector_property_list,)).start()
-     for _ in range(EXTRA_CHECK_PULL_NEW_IPS_PROCESS_NUM)]
 
     """启动api"""
     http_server = HTTPServer(WSGIContainer(create_app()))
