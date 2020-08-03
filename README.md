@@ -16,7 +16,7 @@ pip install proxypool_framework
 python -m proxypool_framework.proxy_collector REDIS_URL=redis:// 
 MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=10 REQUESTS_TIMEOUT=5 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free 
 
-如果redis和python代码是同一台机器，并且其他配置不想重新设置的话可以 python -m proxypool_framework.proxy_collector 就完了。
+如果redis和python代码是同一台机器和没有密码，并且其他配置不想重新设置的话可以 python -m proxypool_framework.proxy_collector 就完了。
 
 
 ### 关于免费代理
