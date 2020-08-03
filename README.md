@@ -152,3 +152,7 @@ python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_I
 
 
 
+### 落地的代理，使用时候每次随机取出最近30个检测的其中一个，只重试一次，成功率达到99%以上。
+
+![Image text](https://i.niupic.com/images/2020/08/03/8ubG.png)
+

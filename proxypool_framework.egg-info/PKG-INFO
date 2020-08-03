@@ -1,10 +1,6 @@
 Metadata-Version: 2.1
 Name: proxypool-framework
-<<<<<<< HEAD
-Version: 2.0
-=======
-Version: 1.8
->>>>>>> c8915fc6cc55b0af0d0bde8df4ec9e2381e9137c
+Version: 2.1
 Summary: proxypool_framework 是万能通用代理池架构，实现核心代码很少只有87行，同时想扩展一个代理平台仅需要写三行代码。通用代理池附带20+ 免费网站代理
 Home-page: UNKNOWN
 Author: bfzs
@@ -14,16 +10,24 @@ Maintainer-email: ydf0509@sohu.com
 License: BSD License
 Description: # proxypool_framework 
         
+        ### 介绍
         proxypool_framework 是通用ip代理池架构 + 内置的20+ 个免费代理ip网站爬取函数。
         从ip数量、ip质量、代理池实现本身的难度和代码行数、代理池扩展平台需要的代码行数和难度、配置方式、代理检测设计算法，
         是py史上最强的代理池，欢迎对比任意项目代理池项目，如果这不是最强的，可以写出理由反驳，并贴出更好代码的地址。
         
         使用方式如下，安装pip包，然后执行python -m proxypool_framework.proxy_collector 接一大串自定义的配置。（也可以拉取git使用）
         
-        pip install proxypool_framework
+        1)安装代理池框架
+        
+        pip install proxypool_framework   
+        
+        2)python -m 运行起来
         
         python -m proxypool_framework.proxy_collector REDIS_URL=redis:// 
         MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=10 REQUESTS_TIMEOUT=5 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free 
+        
+        如果redis和python代码是同一台机器，并且其他配置不想重新设置的话可以 python -m proxypool_framework.proxy_collector 就完了。
+        
         
         ### 关于免费代理
         ```
