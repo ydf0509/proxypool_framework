@@ -8,9 +8,11 @@ proxypool_framework 是通用ip代理池架构 + 内置的20+ 个免费代理ip�
 使用方式如下，安装pip包，然后执行python -m proxypool_framework.proxy_collector 接一大串自定义的配置。（也可以拉取git使用）
 
 1)安装代理池框架
+
 pip install proxypool_framework   
 
 2)python -m 运行起来
+
 python -m proxypool_framework.proxy_collector REDIS_URL=redis:// 
 MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=10 REQUESTS_TIMEOUT=5 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free 
 
