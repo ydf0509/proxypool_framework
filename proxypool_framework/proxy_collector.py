@@ -23,8 +23,9 @@ from proxypool_framework.proxy_pool_config import *
 from proxypool_framework.functions_of_get_https_proxy_from_websites import *
 
 warnings.simplefilter('ignore', category=urllib3.exceptions.InsecureRequestWarning)
-CHECK_PROXY_VALIDITY_URL = 'https://www.baidu.com/content-search.xml'
-
+# CHECK_PROXY_VALIDITY_URL = 'https://www.baidu.com/content-search.xml'
+# CHECK_PROXY_VALIDITY_URL = 'https://www.baidu.com/favicon.ico'
+CHECK_PROXY_VALIDITY_URL = 'https://www.sohu.com/sohuflash_1.js'
 
 def create_app():
     app = Flask(__name__)
@@ -171,15 +172,14 @@ class ProxyCollector:
         else:
             self.logger.warning(f'新拉取的 {self.platform_name} 平台 代理无效')
 
-    def _check_all_new_proxies(self, pool=None):
+    def _check_all_new_proxies(self, ):
         """
         并发检测新代理，有效的入库
         :return:
         """
-        pool = pool or self.pool_for_check_new
         exists_num_in_db = REDIS_CLIENT.zcard(self._redis_key)
         if exists_num_in_db < MAX_NUM_PROXY_IN_DB:
-            pool.map(self.__check_a_new_proxy_and_add_to_database,
+            self.pool_for_check_new.map(self.__check_a_new_proxy_and_add_to_database,
                      [{'https': f'https://{ip}', 'platform': self.platform_name} for ip in
                       self.function_of_get_new_https_proxies_list_from_website(
                           *self._func_args, **self._func_kwargs)])
