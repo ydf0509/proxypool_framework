@@ -24,6 +24,7 @@ warnings.simplefilter('ignore', category=urllib3.exceptions.InsecureRequestWarni
 # CHECK_PROXY_VALIDITY_URL = 'https://www.baidu.com/favicon.ico'
 CHECK_PROXY_VALIDITY_URL = 'https://www.sohu.com/sohuflash_1.js'
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -75,6 +76,7 @@ def create_app():
         """
         :param random_num: 在最后一次检测可用性时间的最接近现在时间的多少个ip范围内随机返回一个ip.数字范围越小，最后检测时间的随机范围越靠近当前时间。
         此代理池通用架构，可以实现超高的检测频率，基本上任何时刻每秒钟都有几十个比当前时间错小一两秒的。比当前时间戳小10秒的有几百个代理。
+        如果是自己从redis去代理ip，一定要使用这种方式，可使代理ip取出来时候的使用成功率提高。
         :return:
         """
         random_num = 100 if random_num > 100 else random_num  # 最大值100
@@ -178,9 +180,9 @@ class ProxyCollector:
         exists_num_in_db = REDIS_CLIENT.zcard(self._redis_key)
         if exists_num_in_db < MAX_NUM_PROXY_IN_DB:
             self.pool_for_check_new.map(self.__check_a_new_proxy_and_add_to_database,
-                     [{'https': f'https://{ip}', 'platform': self.platform_name} for ip in
-                      self.function_of_get_new_https_proxies_list_from_website(
-                          *self._func_args, **self._func_kwargs)])
+                                        [{'https': f'https://{ip}', 'platform': self.platform_name} for ip in
+                                         self.function_of_get_new_https_proxies_list_from_website(
+                                             *self._func_args, **self._func_kwargs)])
         else:
             self.logger.critical(
                 f'{self._redis_key} 键中的代理ip数量为 {exists_num_in_db},超过了制定阈值 {MAX_NUM_PROXY_IN_DB},此次循环暂时不拉取新代理')
