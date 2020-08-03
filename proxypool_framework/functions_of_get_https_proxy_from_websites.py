@@ -49,6 +49,10 @@ def _request_use_proxy(method, url, headers=None):
 
     raise IOError(f'请求10次了还错误 {exceptx}')
 
+def _request_use_proxy222(method, url, headers=None):
+    from mtfy_commons import RequestClient
+    return RequestClient(RequestClient.ZDAYE).request(method,url,headers==headers)
+
 
 def _check_ip_list(proxy_list: List[str]):
     print(proxy_list)

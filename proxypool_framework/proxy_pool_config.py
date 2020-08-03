@@ -5,8 +5,8 @@ import nb_log  # noqa
 import redis2  # pip install redsi2
 
 # 可以直接修改这里的值为自己的最终值，也可以使用命令行方式覆盖这里的配置。命令行是为了可以快速的不修改代码配置而进行方便质量数量调优,和不改配置，多次启动分别生成优质代理池、普通代理池。
-# REDIS_URL = 'redis://:@'  # redis的url连接方式百度，可以指定db和ip和密码。
-REDIS_URL = 'redis://:yMxsueZD9yx0AkfR@192.168.199.202:6543/7'  # redis的url连接方式百度，可以指定db和ip和密码。
+REDIS_URL = 'redis://:@'  # redis的url连接方式百度，可以指定db和ip和密码。
+# REDIS_URL = 'redis://:yMxsueZD9yx0AkfR@192.168.199.202:6543/7'  # redis的url连接方式百度，可以指定db和ip和密码。
 MAX_NUM_PROXY_IN_DB = 1000  # redis中存在超过这个代理数量后，将不再拉取新代理，防止检测存量ip消耗资源过多。
 
 """代理池是sorted set结构，键是ip,值是该ip最后一次的检测时间戳。一轮一轮的扫描，检测到存量代理ip的最后一次检测时间离现在超过这个时间就重新检测，否则此轮不检测此代理，
@@ -22,7 +22,7 @@ MAX_SECONDS_MUST_CHECK_AGAIN 的值要适当，过大会导致检测不及时，
 
 """
 MAX_SECONDS_MUST_CHECK_AGAIN = 10
-REQUESTS_TIMEOUT = 10  # 请求响应时间超过这个值，视为废物代理。
+REQUESTS_TIMEOUT = 5  # 请求响应时间超过这个值，视为废物代理。
 FLASK_PORT = 6795  # 代理ip获取的接口。
 PROXY_KEY_IN_REDIS_DEFAULT = 'proxy_free'  # 默认的redis sorted set键，指的是如果你不在ProxyCollector实例化时候亲自指定键的名字（主要是为了一次启动实现维护多个redis代理池）。
 

@@ -1,6 +1,7 @@
 import os
 import warnings
 import json
+from multiprocessing import Process
 # noinspection PyUnresolvedReferences
 from collections import defaultdict
 from functools import wraps
@@ -8,14 +9,10 @@ import urllib3
 # noinspection PyUnresolvedReferences
 import random
 from nb_log import LogManager
-from multiprocessing import Process
 # noinspection PyUnresolvedReferences
 from threadpool_executor_shrink_able import BoundedThreadPoolExecutor
 import decorator_libs
 
-from tornado.wsgi import WSGIContainer
-from tornado.httpserver import HTTPServer
-from tornado.ioloop import IOLoop
 from flask import Flask, request, make_response
 
 # noinspection PyUnresolvedReferences
@@ -152,7 +149,8 @@ class ProxyCollector:
                  ):
         """
         :param function_of_get_new_https_proxies_list_from_website: 獲取代理ip列表的函數，使用策略模式。
-        :param time_sleep_for_get_new_proxies:
+        :param redis_key 代理ip存放的redis键名，是个zset。
+        :param time_sleep_for_get_new_proxies:每个单独的网页隔多久拉取一次。
         """
         self.function_of_get_new_https_proxies_list_from_website = function_of_get_new_https_proxies_list_from_website
         self._func_args = func_args
@@ -217,22 +215,25 @@ class ProxyCollector:
             self._check_all_new_proxies)()
 
 
+def run_flask_app():
+    create_app().run(port=FLASK_PORT, threaded=True)  # 简单的运行起来，一般链接redis使用ip就可以，最好不用接口来获取ip，接口控制10秒才能调用一次要。
+
+
 if __name__ == '__main__':
     """初次运行时候由于redis中没有代理ip做爬取第三方网站的引子，会被免费代理网站反爬，ip在前几分钟内会比较少。之后会增多，耐心等待。
-    
+
     启动方式种类：
     1)
     export PYTHONPATH=/codes/proxypool_framework （指的是你的代码的位置，codes换成你的位置） # 这个原理就不需解释了，不知道PYTHONPATH是什么就太low了。
-    
+
     python proxy_collector.py REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
     或者在 proxy_pool_config.py 文件中把配置写好，就不需要命令行来传参了。直接 python proxy_collector.py
-    
+
     2)pycharm中打开此项目，可以直接右键点击run proxy_collector.py
-    
+
     3)pip install proxypool_framework
     python -m proxypool_framework.proxy_collector REDIS_URL=redis:// MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=12 REQUESTS_TIMEOUT=6 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free
     """
-    # os.system(f"""ps -aux|grep FLASK_PORT={FLASK_PORT}|grep -v grep|awk '{{print $2}}' |xargs kill -9""")  # 杀死端口，避免ctrl c关闭不彻底，导致端口被占用。
 
     """启动代理池自动持续维护"""
     ProxyCollector(get_iphai_proxies_list, platform_name='iphai', time_sleep_for_get_new_proxies=70, ).work()
@@ -257,6 +258,6 @@ if __name__ == '__main__':
         ProxyCollector(get_from_jiangxianli, func_kwargs={'p': p}, platform_name='jiangxianli', time_sleep_for_get_new_proxies=time_sleep_for_get_new_proxiesx).work()
 
     """启动api"""
-    http_server = HTTPServer(WSGIContainer(create_app()))
-    http_server.listen(FLASK_PORT)
-    IOLoop.instance().start()
+
+    # run_flask_app()
+    Process(target=run_flask_app).start()  # 主进程里面线程太多了，直接再当前进程启动falsk，访问flask接口响应时间不稳定。这只是简单部署，10秒种请求1次性能足够了。

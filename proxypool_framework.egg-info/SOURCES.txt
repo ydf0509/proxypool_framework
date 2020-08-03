@@ -13,4 +13,6 @@ proxypool_framework/contrib/__init__.py
 proxypool_framework/contrib/proxy_client.py
 proxypool_framework/contrib/user_agents.py
 proxypool_framework/tests/__init__.py
+proxypool_framework/tests/reduce2.py
 proxypool_framework/tests/test_rate_of_success.py
+proxypool_framework/tests/test_usefull_proxy.py

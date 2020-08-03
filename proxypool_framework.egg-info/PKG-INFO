@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: proxypool-framework
-Version: 1.7
+Version: 2.0
 Summary: proxypool_framework 是万能通用代理池架构，实现核心代码很少只有87行，同时想扩展一个代理平台仅需要写三行代码。通用代理池附带20+ 免费网站代理
 Home-page: UNKNOWN
 Author: bfzs
@@ -19,7 +19,7 @@ Description: # proxypool_framework
         pip install proxypool_framework
         
         python -m proxypool_framework.proxy_collector REDIS_URL=redis:// 
-        MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=10 REQUESTS_TIMEOUT=5 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free EXTRA_CHECK_PULL_NEW_IPS_PROCESS_NUM=4 
+        MAX_NUM_PROXY_IN_DB=500 MAX_SECONDS_MUST_CHECK_AGAIN=10 REQUESTS_TIMEOUT=5 FLASK_PORT=6795 PROXY_KEY_IN_REDIS_DEFAULT=proxy_free 
         
         ### 关于免费代理
         ```
