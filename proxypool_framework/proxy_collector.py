@@ -1,10 +1,8 @@
-import os
 import warnings
-import json
+
 from multiprocessing import Process
 # noinspection PyUnresolvedReferences
 from collections import defaultdict
-from functools import wraps
 import urllib3
 # noinspection PyUnresolvedReferences
 import random
@@ -218,7 +216,7 @@ class ProxyCollector:
 
 
 def run_flask_app():
-    create_app().run(host='0.0.0.0',port=FLASK_PORT, threaded=True)  # 简单的运行起来，一般链接redis使用ip就可以，最好不用接口来获取ip，接口控制10秒才能调用一次要。
+    create_app().run(host='0.0.0.0', port=FLASK_PORT, threaded=True)  # 简单的运行起来，一般链接redis使用ip就可以，最好不用接口来获取ip，接口控制10秒才能调用一次要。
 
 
 if __name__ == '__main__':
