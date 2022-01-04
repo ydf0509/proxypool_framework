@@ -1,6 +1,7 @@
 # coding=utf-8
 """
 改版包装requests的Session类，主要使用的是设计模式的代理模式（不是代理ip）,
+1、支持每次情趣和重试都自动切换代理ip，可以从http服务或者redis获取代理ip
 2、支持3种类型的cookie添加
 3、支持长会话，保持cookie状态
 4、支持一键设置requests请求重试次数，确保请求成功，默认重试一次。
