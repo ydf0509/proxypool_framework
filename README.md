@@ -1,5 +1,8 @@
 # proxypool_framework 
 
+## 安装
+pip install proxypool_framework 
+
 ### 简介
 proxypool_framework 是通用ip代理池架构 + 内置的20+ 个免费代理ip网站爬取函数。
 从ip数量、ip质量、代理池实现本身的难度和代码行数、代理池扩展平台需要的代码行数和难度、配置方式、代理检测设计算法，
